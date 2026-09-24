@@ -9,8 +9,15 @@ import soundfile as sf
 import torch
 from scipy.signal import resample_poly
 
-from config import BETA_BUILD, DATA_DIR, TOOLS_DIR, VOICES_DIR
-from textclean import clean, chunk
+import sys
+from pathlib import Path
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.config import BETA_BUILD, DATA_DIR, TOOLS_DIR, VOICES_DIR
+from tools.textclean import clean, chunk
 
 
 def main():

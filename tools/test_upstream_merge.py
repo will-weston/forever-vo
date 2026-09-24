@@ -7,7 +7,12 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import generate
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools import generate
 
 
 class UpstreamMergeTests(unittest.TestCase):
@@ -50,7 +55,7 @@ class UpstreamMergeTests(unittest.TestCase):
 import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-import generate
+from tools import generate
 generate.SOUND_INDEX = Path(sys.argv[2])
 for i in range(8):
     key = sys.argv[3] + '-' + str(i)
@@ -59,7 +64,7 @@ for i in range(8):
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / 'sound_index.json'
             children = [subprocess.Popen([sys.executable, '-c', worker,
-                        str(Path(__file__).resolve().parent), str(target), str(i)],
+                        str(Path(__file__).resolve().parents[1]), str(target), str(i)],
                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                         for i in range(3)]
             try:

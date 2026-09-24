@@ -2,8 +2,15 @@
 import argparse
 import sqlite3
 
-from config import DATA_DIR
-from generate import main as generate
+import sys
+from pathlib import Path
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.config import DATA_DIR
+from tools.generate import main as generate
 
 
 def main():

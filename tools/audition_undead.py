@@ -8,8 +8,15 @@ import numpy as np
 import soundfile as sf
 import torch
 
-from config import TOOLS_DIR, VOICES_DIR
-from wowdata import fetch_file
+import sys
+from pathlib import Path
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.config import TOOLS_DIR, VOICES_DIR
+from tools.wowdata import fetch_file
 
 OUT = TOOLS_DIR / 'samples' / 'undead'
 TEXT = "We Forsaken are at war with the Lich King's army of the Scourge. Mindless undead roam these woods. Show them no mercy."

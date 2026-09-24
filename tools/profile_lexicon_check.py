@@ -12,7 +12,13 @@ from scipy.signal import resample_poly
 import torch
 from transformers import pipeline
 
-from tirisfal_profile_check import assess,save
+import sys
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.tirisfal_profile_check import assess,save
 
 
 def main():

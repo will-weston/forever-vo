@@ -12,7 +12,13 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import resample_poly
 
-from prepare_profile_auditions import ROOT, OUT, QUEST_ORDER, digest, save
+import sys
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.prepare_profile_auditions import ROOT, OUT, QUEST_ORDER, digest, save
 
 
 def words(text):

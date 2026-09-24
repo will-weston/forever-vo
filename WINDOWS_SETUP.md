@@ -16,6 +16,12 @@ which records the approved local performances. Importing quest text does not
 generate or download new audio. Pack tables are rebuilt from the files actually
 installed, preserving the 187 quests / 483 recordings in the current pack.
 
+Upstream also supplies `pyproject.toml` and `uv.lock` for its Chatterbox toolchain.
+`Run-Local.ps1` launches the existing Windows environment through uv with
+`--no-project --offline --python`; it does not sync or replace the approved GPU
+dependencies. Helpers use `tools.*` package imports, and direct Windows helper
+invocations remain supported. The separate IndexTTS environment is unchanged.
+
 ## Add more Tirisfal dialogue
 
 Run in PowerShell:

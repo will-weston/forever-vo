@@ -22,10 +22,15 @@ import numpy as np
 import soundfile as sf
 import torch
 
-from config import PACK_DATA_DIR, SOUND_INDEX, SOUNDS_DIR
-from generate import load_sources, load_items, rebuild_tables, save_sound_index
-from textclean import chunk, is_speakable
-from textkey import text_key
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.config import PACK_DATA_DIR, SOUND_INDEX, SOUNDS_DIR
+from tools.generate import load_sources, load_items, rebuild_tables, save_sound_index
+from tools.textclean import chunk, is_speakable
+from tools.textkey import text_key
 
 
 def main():

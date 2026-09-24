@@ -16,12 +16,17 @@ STAGE = ROOT / '.local-state/profile-packs/silverpine-20260923'
 UPSTREAM = Path('C:/repos/wow-voice-research/forever-vo-upstream/tools/data')
 os.environ['FOREVER_VO_DATA_DIR'] = str(ROOT / '.local-state')
 sys.path.insert(0, str(ROOT / 'tools'))
-from generate import load_sources
-from ingest import repair_entry, Repairs, SourceTexts
-from textclean import clean, split_gender, has_gender_branch, is_speakable, chunk
-from textkey import text_key
-from tirisfal_profile_prepare import read_audio, words, sha, save
-from wowdata import fetch_file
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.generate import load_sources
+from tools.ingest import repair_entry, Repairs, SourceTexts
+from tools.textclean import clean, split_gender, has_gender_branch, is_speakable, chunk
+from tools.textkey import text_key
+from tools.tirisfal_profile_prepare import read_audio, words, sha, save
+from tools.wowdata import fetch_file
 
 OBSERVED = {
     '259611': (141689, 'deathguard-baldren'),

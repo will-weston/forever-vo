@@ -1,7 +1,14 @@
 """Create the paired listening index from verified local render manifests."""
 import json
 
-from prepare_profile_auditions import ROOT, OUT
+import sys
+from pathlib import Path
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.prepare_profile_auditions import ROOT, OUT
 
 
 def main():

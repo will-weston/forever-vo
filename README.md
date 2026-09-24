@@ -11,7 +11,7 @@ narration, and the dialogue panel always uses the quest-style parchment.
 The current local pack covers 187 quests with 483 recordings across Tirisfal,
 Mulgore, Silverpine, and related class/delivery chains.
 
-Synced with upstream `main` through `365290a` on September 24, 2026, including
+Synced with upstream `main` through `99d78ee` on September 24, 2026, including
 46 additional community capture files, text/gender repairs, and mixed
 speaker/narrator playback support. The community corpus now contains 673 quest
 stages and 286 conversation records. New text is available for generation; this
@@ -29,7 +29,8 @@ documented in [WINDOWS_SETUP.md](WINDOWS_SETUP.md). Historical audition reports
 contain links to local artifacts and are not portable build instructions.
 The existing UI smoke harness is available as `tools/ui_smoke_test.lua` and runs
 under Lua 5.1 from the repository root. Existing capture-boundary checks run with
-`python tools/test_local_safety.py` in the configured tools environment.
+`uv run --no-project --python .venv/Scripts/python.exe python -m tools.test_local_safety`
+in the configured Windows tools environment.
 
 Based on [Quinn Dougherty's Forever Voiceover](https://github.com/quinn-dougherty/forever-vo).
 The original license and attribution are retained. The upstream project overview
@@ -104,11 +105,15 @@ priorities, so a pack of new or revised lines can sit on top of a base pack.
 
 ## Setup
 
-Scripts declare their own dependencies in inline metadata and run with
-[`uv run`](https://docs.astral.sh/uv/guides/scripts/); `tools/run.sh` wraps
-that and, on NixOS, also supplies Python, ffmpeg and the shared libraries the
-CUDA wheels expect. Elsewhere, `uv run tools/<script>.py` works directly with
-`ffmpeg` on PATH.
+The tools are a [uv](https://docs.astral.sh/uv/) project (`pyproject.toml`,
+`uv.lock`, `.python-version`; uv fetches the interpreter itself) and
+`flake.nix` provides the rest: uv, ffmpeg, lua 5.1 and the shared libraries the
+CUDA wheels expect. `tools/run.sh` is `uv run` inside that shell, so every
+script, console script (`fvo-ingest`, `fvo-generate`, ... see
+`pyproject.toml`) and one-liner runs against the same pins. Without nix,
+`uv run tools/<script>.py` works directly with `ffmpeg` on PATH. The GPU stack
+is the `tts` dependency group, on by default; `uv run --no-group tts ...`
+skips it for a checkout that only ingests or releases.
 
 ```bash
 ./tools/run.sh tools/tts_smoke.py            # CUDA check, writes tools/smoke.wav

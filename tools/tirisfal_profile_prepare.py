@@ -19,10 +19,15 @@ os.environ['FOREVER_VO_DATA_DIR'] = str(ROOT/'.local-state')
 STAGE = ROOT/'.local-state/profile-packs/tirisfal-20260923'
 PILOT = ROOT/'tools/samples/tirisfal-stock-profiles'
 sys.path.insert(0, str(ROOT/'tools'))
-from generate import load_sources
-from textclean import clean, split_gender, has_gender_branch, is_speakable, chunk
-from textkey import text_key
-from wowdata import fetch_file
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.generate import load_sources
+from tools.textclean import clean, split_gender, has_gender_branch, is_speakable, chunk
+from tools.textkey import text_key
+from tools.wowdata import fetch_file
 
 
 def save(path, value):

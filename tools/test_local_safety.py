@@ -7,8 +7,14 @@ import zlib
 from pathlib import Path
 from unittest.mock import patch
 
-import exportfile
-from generate import Item, sound_path
+import sys
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools import exportfile
+from tools.generate import Item, sound_path
 
 
 class LocalSafetyTests(unittest.TestCase):

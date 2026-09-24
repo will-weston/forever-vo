@@ -15,8 +15,13 @@ ROOT=Path(__file__).resolve().parents[1]
 STAGE=Path(os.environ.get('FOREVER_VO_PROFILE_STAGE',str(ROOT/'.local-state/profile-packs/tirisfal-20260923'))).resolve()
 os.environ['FOREVER_VO_DATA_DIR']=str(ROOT/'.local-state')
 sys.path.insert(0,str(ROOT/'tools'))
-from config import SOUNDS_DIR,SOUND_INDEX,PACK_DATA_DIR
-from generate import load_sources,load_items,rebuild_tables
+
+# Keep direct Windows helper invocations working alongside package entry points.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.config import SOUNDS_DIR,SOUND_INDEX,PACK_DATA_DIR
+from tools.generate import load_sources,load_items,rebuild_tables
 
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()

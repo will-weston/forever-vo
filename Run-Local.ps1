@@ -7,6 +7,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $pythonPath = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+$uvPath = Join-Path $PSScriptRoot '.bootstrap\Scripts\uv.exe'
+if (-not (Test-Path -LiteralPath $uvPath)) { throw 'The local uv launcher is missing.' }
 $ffmpegPath = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot '.local-tools\ffmpeg') -Filter ffmpeg.exe -Recurse | Select-Object -First 1
 if (-not $ffmpegPath) { throw 'Local FFmpeg installation is missing.' }
 $priorPath = $env:PATH
@@ -29,7 +31,9 @@ try {
     $env:TQDM_DISABLE = '1'
     Push-Location $PSScriptRoot
     try {
-        & $pythonPath (Join-Path $PSScriptRoot "tools\$Tool.py") @ToolArguments
+        # Keep the approved Windows GPU environment; the upstream project lock
+        # describes a separate Chatterbox stack. uv launches without syncing it.
+        & $uvPath run --no-project --offline --python $pythonPath python -m "tools.$Tool" @ToolArguments
         if ($LASTEXITCODE -ne 0) { throw "$Tool failed with exit code $LASTEXITCODE" }
     } finally { Pop-Location }
 } finally {
