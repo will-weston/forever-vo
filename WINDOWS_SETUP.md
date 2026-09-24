@@ -8,6 +8,14 @@ Fully exit and restart WoW Forever after installation or generating new audio. A
 
 The initial source is Classic quest dialogue. Forever-specific additions/rewrites need to be captured in game; this is not a complete Forever voice pack. Only generated MP3s are playable, regardless of how much quest text is in the database. This setup generates audio before playback, not live during conversations.
 
+The September 24 upstream sync also imports the shared community corpus in
+`tools/data/capture.json`. The local generator reads that corpus alongside
+`.local-state` automatically; local captures keep precedence. The versioned
+upstream sound index is not substituted for `.local-state/sound_index.json`,
+which records the approved local performances. Importing quest text does not
+generate or download new audio. Pack tables are rebuilt from the files actually
+installed, preserving the 187 quests / 483 recordings in the current pack.
+
 ## Add more Tirisfal dialogue
 
 Run in PowerShell:

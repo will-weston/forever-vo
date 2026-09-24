@@ -1,5 +1,63 @@
 # Changelog
 
+## 0.1.4
+
+- Quest lines that address you by gender ("lad" or "lass", "sir" or "madam")
+  are no longer voiced with whichever word the first contributor happened to
+  hear. The client resolves that choice before the addon sees the text, and
+  unlike your name, class and race the other word is simply gone, so the
+  pipeline now puts the branch back by comparing a male and a female reading
+  of the same line. To make that possible the capture and `/fvo export` record
+  your character's sex (one letter, nothing else new leaves the client), and a
+  voice pack can ask for a line to be heard again: when the pack says it still
+  lacks your sex's reading of a quest, that quest goes into your export even
+  though it played. The same hook lets a future pack ask for any line whose
+  capture has gone stale. Where the raw text is known (Classic, the beta quest
+  cache) a single reading that matches it is fixed at once; thanks to
+  jhaubrich for that part and for raising the problem (#28, #29).
+- The export and logout messages count lines worth contributing, not only
+  lines without audio.
+
+## 0.1.3
+
+- Stage directions are read by the narrator. Lines like "Hmm... <Jorgen looks
+  up at you through squinted eyes.> All right, I'll help ya" used to skip the
+  part in angle brackets; now the narrator says it between the NPC's words, in
+  whichever narrator voice you picked. Lines that were nothing but a stage
+  direction, silent until now, are voiced too. Needs a voice pack built after
+  this change; older packs play as before.
+- The "no voice pack found" messages name the CurseForge packs to install.
+- A quest read from an item, or turned in at a game object, is no longer
+  credited to the last NPC you spoke to. The client's "npc" unit outlives its
+  dialog, so Admiral Proudmoore's orders were captured and voiced as Gar'Thok
+  and the Corpse Laden Boat's turn-in text as High Executor Hadrec, face and
+  all. Quest events now trust the quest giver unit the way Blizzard's own frame
+  does, an item-started quest is named after its item, and the book shows for
+  it instead of the turn-in NPC. Packs built after this record the giver and
+  the turn-in speaker separately, so a turn-in at an object shows the object
+  even when the client does not say who is speaking.
+- The Classic voice pack now comes as two downloads, Base (quests to level 40
+  and all gossip) and Base Endgame (quests from 41), because CurseForge caps a
+  file at 1 GB. The "no voice pack found" message names both.
+
+## 0.1.2
+
+- A character whose name is an ordinary word ("It") no longer has that word
+  eaten out of every line it hears. The client always writes a character's
+  name capitalised, so the name is now matched only in its own case; class and
+  race still match in either case, because the server writes both.
+- Names beginning with a non-ASCII letter ("Ösel", "Élodie") are redacted
+  again. The whole-word check in 0.1.1 could not fire next to such a letter,
+  so those names were left in captured text and in `/fvo export`. Thanks to
+  jhaubrich for the report and the fix.
+- Quests whose greeting branches on your gender but whose turn-in does not now
+  play the turn-in. The pack recorded one flag for the whole quest, so the
+  addon asked for a gendered file that was never made and played silence. New
+  packs record which events branch; packs built before this still work. Thanks
+  to joergensentroels for the fix.
+- The pipeline now reads the addon version an export carries, so it can tell
+  which repairs a submission needs.
+
 ## 0.1.1
 
 - Lines no longer call you by the wrong class. The client fills in $n, $c and $r

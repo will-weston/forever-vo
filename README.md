@@ -11,6 +11,12 @@ narration, and the dialogue panel always uses the quest-style parchment.
 The current local pack covers 187 quests with 483 recordings across Tirisfal,
 Mulgore, Silverpine, and related class/delivery chains.
 
+Synced with upstream `main` through `365290a` on September 24, 2026, including
+46 additional community capture files, text/gender repairs, and mixed
+speaker/narrator playback support. The community corpus now contains 673 quest
+stages and 286 conversation records. New text is available for generation; this
+sync preserves the installed performances and does not add audio recordings.
+
 **This repository contains source code and pack metadata, not the generated
 audio.** MP3s, reference recordings, model weights, environments, local captures,
 and backups are kept outside Git. Downloading the source alone does not install
@@ -36,7 +42,7 @@ generate yourself from a local text-to-speech model.
 
 **The quest text for Forever additions is crowd sourced, please help out by downloading the addon and occasionally running `/fvo export`**. 
 
-Three addons on CurseForge: the player, and two voice packs that stack.
+Four addons on CurseForge: the player, and three voice packs that stack.
 
 - **[Forever Voiceover](https://www.curseforge.com/wow/addons/forever-voiceover)**
   (`ForeverVO`) — the player, and the only one you need to start. Reads quest
@@ -46,9 +52,15 @@ Three addons on CurseForge: the player, and two voice packs that stack.
   the quest log. It also records every line it sees so new audio can be
   generated for what is still missing.
 - **[Forever Voiceover Data: Base](https://www.curseforge.com/wow/addons/forever-voiceover-data-base)**
-  (`ForeverVO_Data`, priority 100) — the Classic lines. Big, and updated almost
-  never: this is text that has not changed since Classic, so once a line is
-  voiced it stays voiced. Install it once and forget it.
+  (`ForeverVO_Data_Base`, priority 100) — the Classic lines for quests up to
+  level 40, and all Classic gossip. Big, and updated almost never: this is text
+  that has not changed since Classic, so once a line is voiced it stays voiced.
+  Install it once and forget it.
+- **[Forever Voiceover Data: Base Endgame](https://www.curseforge.com/wow/addons/forever-voiceover-data-base-endgame)**
+  (`ForeverVO_Data_Base_Endgame`, priority 100) — the rest of the Classic
+  lines, quests from level 41 up. The same pack as Base in two halves, because
+  CurseForge caps a file at 1 GB. Both halves carry the alternate narrator
+  voices for their quests.
 - **[Forever Voiceover Data: Forever](https://www.curseforge.com/wow/addons/forever-voiceover-data-forever)**
   (`ForeverVO_Data_Forever`, priority 200) — everything Forever adds or
   rewrites. Small, and updated often, especially when new content drops: these

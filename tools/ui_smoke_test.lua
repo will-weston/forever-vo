@@ -69,6 +69,7 @@ end
 function CopyTable(t) local out={}; for k,v in pairs(t) do out[k]=type(v)=='table' and CopyTable(v) or v end; return out end
 function wipe(t) for k in pairs(t) do t[k]=nil end end
 format=string.format
+strfind=string.find
 function strtrim(s) return s:match('^%s*(.-)%s*$') end
 function PlaySound() end
 function SquareButton_SetIcon(button,name) assert(name=="RIGHT"); button.icon.direction=name end
@@ -253,3 +254,44 @@ ns.db.stopOnClose=true;ns.Events.GOSSIP_CLOSED();assert(Q:IsEmpty())
 conversation='Missing audio is still captured for later generation.'
 ns.Events.GOSSIP_SHOW();assert(Q:IsEmpty() and captured[#captured].found==false)
 print('PASS: repeat dialogue, greeting playback, deduplication, quest priority, close behavior, and missing-audio capture remain functional')
+
+-- Upstream packs use event-letter gender flags and optional narrator parts.
+pack.quests[2]={a=2,c=3,g='a',wa='mf'}
+assert(ns.Packs:FindQuest(2,'accept'):find('m%-2%-accept'))
+assert(ns.Packs:FindQuest(2,'complete'):find('Quests\\2%-complete'))
+assert(ns.Packs:QuestWanted(pack,2,'accept') and not ns.Packs:QuestWanted(pack,2,'complete'))
+pack.quests[3]={aP={{d=1},{d=2,n=true}}}
+pack.narrator[3]={[1]={aP={[2]=9}}}
+local partPath,partSeconds,partPack,parts=ns.Packs:FindQuest(3,'accept')
+assert(partPath:find('3%-p1%-accept') and partSeconds==3 and #parts==2)
+assert(parts[2].path:find('Quests\\3%-p2%-accept') and parts[2].duration==2)
+local mixed={path=partPath,duration=partSeconds,pack=partPack,parts=parts,kind='quest',name='Narrated quest'}
+Q:Add(mixed);assert(mixed.handle==parts[1].path)
+advance(1.3);assert(mixed.handle==parts[2].path)
+Q:Pause();advance(5);assert(Q:Current()==mixed and not Q:IsPlaying())
+Q:Resume();assert(mixed.handle==parts[1].path)
+advance(1.3);assert(mixed.handle==parts[2].path)
+Q:Skip();advance(5);assert(Q:IsEmpty())
+Q:Add(mixed);advance(4);assert(Q:IsEmpty())
+pack.gossip[1568][1].P={{d=1,n=true},{d=2}}
+local _,gossipSeconds,_,gossipParts=ns.Packs:FindGossip(1568,pack.gossip[1568][1].t)
+assert(gossipSeconds==3 and gossipParts[1].path:find('Gossip\\test%-p1%-greeting'))
+print('PASS: upstream gender flags, recapture markers, and default-narrator parts work with pause, resume, skip, and completion')
+
+pack.quests[4]={a=2,c=3,npc=1568,ender=-456}
+pack.npcs[-456]='Test Monument'
+function GetQuestID() return 4 end
+function GetTitleText() return 'Item quest' end
+function GetQuestText() return 'Read the letter.' end
+function GetRewardText() return 'Read the monument.' end
+C_Item={GetItemNameByID=function()return 'Test Letter' end}
+ns.Events.QUEST_DETAIL(123)
+assert(Q:Current().name=='Test Letter' and Q:Current().isObject and Q:Current().speakerKey==nil)
+assert(captured[#captured].speaker.startItemID==123)
+ns.Events.QUEST_FINISHED();Q:Clear()
+units.questnpc=nil;units.npc='Creature-0-0-0-0-1568-2'
+ns.Events.QUEST_COMPLETE()
+assert(Q:Current().speakerKey==-456 and Q:Current().name=='Test Monument')
+assert(H.activePortrait==nil and H.frame.Portrait:IsShown())
+Q:Clear()
+print('PASS: item and object dialogue does not inherit a stale NPC portrait')

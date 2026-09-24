@@ -23,17 +23,31 @@ end
 
 local currentQuestItem, currentGossipItem
 local lastGossipOptions, selectedGossipOption
+local dialogGUID   -- whoever opened the dialog that is up right now
 
 -- ---------------------------------------------------------------------------
 -- Speaker resolution
 -- ---------------------------------------------------------------------------
 
 --- Describes whoever the player is talking to right now.
-local function CurrentSpeaker()
+---
+--- The "npc" unit outlives its dialog: it still named High Executor Hadrec
+--- three minutes after his frame closed, so the Corpse Laden Boat's turn-in
+--- text was captured, voiced and portrayed as his, and a letter read next to
+--- Gar'Thok was voiced as him. Blizzard's own quest frame names and portrays
+--- the giver from "questnpc" alone, so quest events trust that unit, and
+--- "npc" only while the dialog it opened is still up.
+local function CurrentSpeaker(forQuest)
     local unit = Util.DialogUnit()
+    if forQuest and unit == "npc" and UnitGUID("npc") ~= dialogGUID then
+        unit = nil
+    end
     local guid = unit and UnitGUID(unit)
     local name = unit and UnitName(unit)
     local key = Util.SpeakerKeyFromGUID(guid)
+    if guid and (unit == "questnpc" or not forQuest) then
+        dialogGUID = guid
+    end
     return {
         guid = guid,
         name = name,
@@ -42,13 +56,14 @@ local function CurrentSpeaker()
     }
 end
 
---- For quests handed out by items or shared by players, fall back to the giver
---- recorded in the packs so the portrait and name are still right.
-local function ResolveQuestSpeaker(speaker, questID)
-    if speaker.speakerKey then
+--- For quests handed out by items or shared by players, and turn-ins at a game
+--- object the client leaves unattributed, fall back to the speaker recorded in
+--- the packs so the portrait and name are still right.
+local function ResolveQuestSpeaker(speaker, questID, event)
+    if speaker.speakerKey or speaker.startItemID then
         return speaker
     end
-    local key = Packs:QuestGiver(questID)
+    local key = Packs:QuestGiver(questID, event)
     if key then
         speaker.speakerKey = key
         speaker.name = Packs:SpeakerName(key) or speaker.name
@@ -58,18 +73,26 @@ local function ResolveQuestSpeaker(speaker, questID)
     return speaker
 end
 
+--- A quest started by reading an item: the item is the speaker, and the
+--- narrator reads it under the book.
+local function ItemSpeaker(itemID)
+    local name = C_Item.GetItemNameByID(itemID) or C_Item.GetItemInfo(itemID)
+    return { name = name, isObject = true, startItemID = itemID }
+end
+
 -- ---------------------------------------------------------------------------
 -- Quest events
 -- ---------------------------------------------------------------------------
 
-local function QueueQuest(event, text)
+local function QueueQuest(event, text, startItemID)
     local questID = GetQuestID()
     local title = GetTitleText()
     if not questID or questID == 0 then
         return
     end
-    local speaker = ResolveQuestSpeaker(CurrentSpeaker(), questID)
-    local path, duration, pack = Packs:FindQuest(questID, event)
+    local speaker = startItemID and ItemSpeaker(startItemID) or CurrentSpeaker(true)
+    speaker = ResolveQuestSpeaker(speaker, questID, event)
+    local path, duration, pack, parts = Packs:FindQuest(questID, event)
 
     ns.Capture:Record({
         kind = "quest", event = event, questID = questID, title = title, text = text,
@@ -89,15 +112,19 @@ local function QueueQuest(event, text)
     local item = {
         kind = "quest", event = event, questID = questID, title = title, text = text,
         name = speaker.name, speakerKey = speaker.speakerKey, guid = speaker.guid, isObject = speaker.isObject,
-        path = path, duration = duration, pack = pack,
+        path = path, duration = duration, pack = pack, parts = parts,
     }
     if Queue:Add(item) then
         currentQuestItem = item
     end
 end
 
-function Events.QUEST_DETAIL()
-    QueueQuest("accept", GetQuestText())
+function Events.QUEST_DETAIL(questStartItemID)
+    -- The client says when a quest was started from an item; nothing else does
+    if questStartItemID == 0 then
+        questStartItemID = nil
+    end
+    QueueQuest("accept", GetQuestText(), questStartItemID)
 end
 
 function Events.QUEST_PROGRESS()
@@ -113,6 +140,7 @@ function Events.QUEST_FINISHED()
         Queue:Remove(currentQuestItem)
     end
     currentQuestItem = nil
+    dialogGUID = nil
 end
 
 -- ---------------------------------------------------------------------------
@@ -128,7 +156,7 @@ local function QueueGossip(event, text)
         return -- dialog opened while a menu was up; nothing to attribute it to
     end
     local speakerKey = speaker.speakerKey or Packs:SpeakerKeyByName(speaker.name)
-    local path, duration, pack = Packs:FindGossip(speakerKey, text)
+    local path, duration, pack, parts = Packs:FindGossip(speakerKey, text)
 
     ns.Capture:Record({
         kind = "gossip", event = event, text = text, title = selectedGossipOption,
@@ -145,7 +173,7 @@ local function QueueGossip(event, text)
         kind = "gossip", event = event, text = text,
         title = selectedGossipOption and format("\"%s\"", selectedGossipOption) or nil,
         name = speaker.name, speakerKey = speakerKey, guid = speaker.guid, isObject = speaker.isObject,
-        path = path, duration = duration, pack = pack,
+        path = path, duration = duration, pack = pack, parts = parts,
     }
     if Queue:Add(item) then
         currentGossipItem = item
@@ -168,6 +196,7 @@ function Events.GOSSIP_CLOSED()
     end
     currentGossipItem = nil
     selectedGossipOption = nil
+    dialogGUID = nil
 end
 
 -- ---------------------------------------------------------------------------

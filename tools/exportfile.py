@@ -48,6 +48,8 @@ def decode(export: str) -> dict:
 def to_capture(data: dict, origin: str) -> dict:
     """Converts the compact export into the capture.json schema used by the tools."""
     out = {"version": 2, "source": "community", "origin": origin, "quests": {}, "gossip": {}, "npcs": {}}
+    if data.get("addon"):
+        out["addon"] = data["addon"]   # ingest.py gates repairs on the addon that tokenised the text
     for line in data.get("lines", []):
         entry = {
             "event": line.get("e"),
@@ -59,6 +61,8 @@ def to_capture(data: dict, origin: str) -> dict:
             "isObject": line.get("o") or None,
             "zone": line.get("z"),
             "mapID": line.get("m"),
+            "sex": line.get("g"),            # "m"/"f", from addon 0.1.4 on
+            "wanted": line.get("w") or None,  # a voiced line the pack asked to hear again
             "build": data.get("build"),
             "source": "community",
         }

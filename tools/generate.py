@@ -31,10 +31,20 @@ run still spends its time on lines that have no audio at all:
 
     ./tools/run.sh tools/generate.py --narrator-voices none   # skip them
     ./tools/run.sh tools/generate.py --narrator-only          # a dedicated pass
+
+A line that mixes the speaker and the narrator -- "Hmm... <Jorgen looks up at
+you.> All right, I'll help ya." -- keeps its whole-line file with the stage
+direction left out (older addons play that) and also gets one file per part in
+reading order, 1241-p1-complete, 1241-p2-complete, ...: the speaker's words in
+their voice and each stage direction in the narrator's, the latter again in
+every alternate narrator voice. The addon plays the parts back to back and
+swaps in the player's narrator. A line that is only a stage direction has
+parts and no whole-line file.
 """
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import json
 import os
 import subprocess
@@ -47,7 +57,7 @@ from typing import NamedTuple
 from config import (CAPTURE_JSON, DATA_DIR, FALLBACK_VOICES, NARRATOR_VOICE, NARRATOR_VOICES,
                     PACK_DATA_DIR, SOUND_INDEX, SOUNDS_DIR, VOICES_DIR)
 from luatable import lua_string
-from textclean import chunk, clean, has_gender_branch, is_speakable, split_gender
+from textclean import chunk, clean, has_gender_branch, is_speakable, segments, split_gender
 from textkey import text_key
 from wowdata import voice_for_npc
 
@@ -88,22 +98,50 @@ class Item:
         return f"{speaker}-{self.hash}"
 
     @property
-    def gendered(self) -> bool:
-        return has_gender_branch(clean(self.raw_text))
-
-    @property
     def is_narrator(self) -> bool:
         """Lines read by the narrator (objects, items, speakers with no gender)
         get one file per alternate narrator voice."""
         return self.voice == NARRATOR_VOICE
 
-    def variants(self) -> list[tuple[str, str]]:
-        """(file base name, text to speak); two when the text branches on player gender."""
-        text = clean(self.raw_text)
-        if has_gender_branch(text):
-            male, female = split_gender(text)
-            return [(f"m-{self.base_name}", male), (f"f-{self.base_name}", female)]
-        return [(self.base_name, text)]
+    @property
+    def gendered(self) -> bool:
+        return has_gender_branch(clean(self.raw_text, keep_stage_directions=self.is_narrator))
+
+    def variants(self) -> list[Variant]:
+        """One Variant per file base name; two when the text branches on player gender."""
+        raw = self.raw_text
+        branches = [("", raw)]
+        if self.gendered:
+            male, female = split_gender(raw)
+            branches = [("m-", male), ("f-", female)]
+        out = []
+        for prefix, text in branches:
+            # The narrator reads a stage direction as prose. A speaker leaves it
+            # out of the whole-line file and the line also gets parts, so the
+            # narrator can say it between the speaker's words.
+            parts = [] if self.is_narrator else segments(text)
+            if len(parts) == 1 and parts[0][0] == "npc":
+                parts = []
+            out.append(Variant(f"{prefix}{self.base_name}", clean(text, keep_stage_directions=self.is_narrator), parts))
+        return out
+
+
+class Variant(NamedTuple):
+    """One file base name of a line and what is spoken under it."""
+    base: str
+    text: str                         # the whole line as its speaker reads it
+    parts: list[tuple[str, str]]      # ("npc"|"narrator", words) in reading order when the
+                                      # line mixes the speaker and the narrator, else empty
+
+
+def part_name(base: str, index: int) -> str:
+    """File base name of a line's part: 1241-p2-complete, 2492-p1-aa6f2374,
+    m-170-p1-accept. The part number sits before the last segment so that the
+    name still ends in the quest event or text hash: sound_folder() and every
+    older tool that tells quests from gossip by the last segment keep working
+    (an older generator still running probes any file it sees under Sounds/)."""
+    head, _, last = base.rpartition("-")
+    return f"{head}-p{index}-{last}"
 
 
 # ----------------------------------------------------------------------------
@@ -178,13 +216,18 @@ def parse_narrator_voices(spec: str | None) -> list[str]:
     return chosen
 
 
-SOURCE_ORDER = ["classic", "questcache", "capture"]  # later sources override earlier ones
+SOURCE_ORDER = ["classic", "questcache", "bundled_capture", "capture"]  # later sources override earlier ones
 
 
 def load_sources() -> dict:
     """Merges tools/data/bulk/*.json and capture.json field by field, capture winning."""
     merged = {"quests": {}, "gossip": {}, "npcs": {}}
     files = {p.stem: p for p in (DATA_DIR / "bulk").glob("*.json")}
+    # Local Windows state is isolated from the versioned community corpus.
+    # Include new upstream captures while letting local captures override them.
+    bundled_capture = Path(__file__).resolve().parent / "data" / "capture.json"
+    if bundled_capture.exists() and bundled_capture.resolve() != CAPTURE_JSON.resolve():
+        files["bundled_capture"] = bundled_capture
     if CAPTURE_JSON.exists():
         files["capture"] = CAPTURE_JSON
     for name in SOURCE_ORDER + sorted(set(files) - set(SOURCE_ORDER)):
@@ -273,9 +316,21 @@ class Synth:
         silence = self.torch.zeros(1, int(self.sr * settings.get("chunk_pause", 0.35)))
         for part in chunk(text):
             kwargs = {"audio_prompt_path": str(reference)} if reference else {}
-            wav = self.model.generate(part, exaggeration=settings.get("exaggeration", 0.45),
-                                      cfg_weight=settings.get("cfg_weight", 0.5), **kwargs)
-            pieces.append(wav.cpu())
+            # Chatterbox sometimes answers a short standalone sentence with a
+            # blip: "Galgar wipes his brow." came back as 0.36 s where the other
+            # narrator voices took 2 s, and 17 stage-direction parts of two to
+            # four words were like it (2026-09-23). The output is sampled, so a
+            # second try usually speaks; keep the longest of a few.
+            floor = max(0.5, 0.15 * len(part.split()))
+            best = None
+            for attempt in range(3):
+                wav = self.model.generate(part, exaggeration=settings.get("exaggeration", 0.45), cfg_weight=settings.get("cfg_weight", 0.5), **kwargs).cpu()
+                if best is None or wav.shape[-1] > best.shape[-1]:
+                    best = wav
+                if best.shape[-1] / self.sr >= floor:
+                    break
+                print(f"    short output ({wav.shape[-1] / self.sr:.2f}s for {len(part.split())} words), retrying")
+            pieces.append(best)
             pieces.append(silence)
         audio = self.torch.cat(pieces[:-1], dim=-1)
         duration = audio.shape[-1] / self.sr
@@ -283,16 +338,23 @@ class Synth:
         import torchaudio
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
             tmp_path = Path(tmp.name)
+        # Encoded beside the target and renamed into place: a worker killed mid-encode
+        # (unit restart, lost GPU) would otherwise leave a truncated mp3 under the
+        # final name, which every later run skips as done. The partial file has no
+        # .mp3 suffix so the table rebuild's glob cannot pick it up either.
+        out_part = out_mp3.with_suffix(f".{os.getpid()}.part")
         try:
             torchaudio.save(str(tmp_path), audio, self.sr)
             out_mp3.parent.mkdir(parents=True, exist_ok=True)
             subprocess.run(
                 ["ffmpeg", "-y", "-v", "error", "-i", str(tmp_path), "-ac", "1", "-ar", "44100",
-                 "-codec:a", "libmp3lame", "-q:a", "4", str(out_mp3)],
+                 "-codec:a", "libmp3lame", "-q:a", "4", "-f", "mp3", str(out_part)],
                 check=True,
             )
+            os.replace(out_part, out_mp3)
         finally:
             tmp_path.unlink(missing_ok=True)
+            out_part.unlink(missing_ok=True)
         return duration
 
 
@@ -311,6 +373,8 @@ def lua_value(value) -> str:
         return lua_string(value)
     if isinstance(value, dict):   # keyed sub-table, e.g. a duration per narrator voice
         return "{ " + ", ".join(f"[{lua_value(k)}]={lua_value(v)}" for k, v in sorted(value.items())) + " }"
+    if isinstance(value, list):   # array, e.g. the parts of a line; dict elements are records
+        return "{ " + ", ".join(lua_record(v) if isinstance(v, dict) else lua_value(v) for v in value) + " }"
     raise TypeError(type(value))
 
 
@@ -327,8 +391,10 @@ def write_table(filename: str, field: str, lines: list[str], data_dir: Path = PA
     # tables every 25 files, and the client loads these, so a half-written
     # Quests.lua would be a syntax error in someone's game. Either shard's
     # snapshot is valid on its own, so last writer wins is fine; a torn file is not.
+    # The temporary name carries the pid: with one shared name, two coinciding
+    # writes would rename the other's half-written file into place.
     target = data_dir / filename
-    tmp = target.with_suffix(target.suffix + ".tmp")
+    tmp = target.with_suffix(f"{target.suffix}.{os.getpid()}.tmp")
     tmp.write_text(
         f"-- Generated by tools/generate.py; do not edit.\nlocal pack = {pack_global}\n{prelude}"
         f"pack.{field} = {{\n{body}\n}}\n",
@@ -350,25 +416,80 @@ def probe_duration(path: Path) -> float:
     return float(out)
 
 
-def save_sound_index(sound_index: dict) -> None:
-    """Merges our entries into whatever is on disk and replaces the file atomically.
+def index_rank(value) -> int:
+    """How much an index entry knows: 3 for a generator's record (voice and text
+    fingerprint), 1 for a pre-fingerprint record, 0 for a duration a table
+    rebuild probed from the file, or a legacy bare float. An entry may only
+    replace one of equal or lower rank, so a probe never erases a record."""
+    if not isinstance(value, dict):
+        return 0
+    return (1 if value.get("v") is not None else 0) + (2 if "t" in value else 0)
 
-    Two workers (--shard) hold their own copy in memory and write every 25 files,
-    so a plain write would drop whatever the other one recorded since we loaded.
-    Re-reading first keeps both, and os.replace means a crash mid-write cannot
-    leave a half-written index behind."""
+
+@contextmanager
+def sound_index_lock(path: Path):
+    """Serialize index writers on Windows as well as POSIX."""
+    with path.open("a+b") as lock:
+        if os.name == "nt":
+            import msvcrt
+            if lock.seek(0, os.SEEK_END) == 0:
+                lock.write(b"\0")
+                lock.flush()
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+            try:
+                yield
+            finally:
+                lock.seek(0)
+                msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def save_sound_index(sound_index: dict, keys: set[str] | None = None) -> None:
+    """Merges this process's entries into the index on disk and replaces the file
+    atomically, then brings the in-memory copy up to date with the disk.
+
+    Two workers (--shard) each hold a copy in memory and write every 25 files.
+    Only `keys` -- what this process wrote since its last save; everything when
+    None -- are merged in, so a stale copy of an entry the other worker has since
+    rewritten does not overwrite it, and an entry never replaces one that knows
+    more (index_rank), so a duration a table rebuild probed from the other
+    worker's fresh file cannot erase that worker's record of its voice and text
+    (which is what left 2,790 files with no voice on 2026-09-22). The
+    read-merge-write runs under a lock and the temporary name carries the pid,
+    so two saves cannot interleave or rename each other's half-written file."""
     SOUND_INDEX.parent.mkdir(parents=True, exist_ok=True)
-    merged: dict = {}
-    if SOUND_INDEX.exists():
-        try:
-            merged = json.loads(SOUND_INDEX.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            merged = {}
-    merged.update(sound_index)
-    tmp = SOUND_INDEX.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(merged, indent=1, sort_keys=True), encoding="utf-8")
-    os.replace(tmp, SOUND_INDEX)
-    sound_index.update(merged)
+    lock_path = SOUND_INDEX.with_suffix(".lock")
+    with sound_index_lock(lock_path):
+        merged: dict = {}
+        if SOUND_INDEX.exists():
+            try:
+                merged = json.loads(SOUND_INDEX.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                merged = {}
+        for key in list(keys if keys is not None else sound_index):
+            value = sound_index.get(key)
+            if value is None:
+                # A key this process dropped: the file behind it was removed (an
+                # alternate narrator recording of a line the narrator no longer
+                # reads), so the entry goes with it.
+                merged.pop(key, None)
+            elif index_rank(value) >= index_rank(merged.get(key)):
+                merged[key] = value
+        tmp = SOUND_INDEX.with_suffix(f".json.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(merged, indent=1, sort_keys=True), encoding="utf-8")
+        os.replace(tmp, SOUND_INDEX)
+    for key, value in merged.items():
+        if index_rank(value) >= index_rank(sound_index.get(key)):
+            sound_index[key] = value
+    if keys is not None:
+        keys.clear()
 
 
 def speaker_int(key: str | None) -> int | None:
@@ -379,14 +500,26 @@ def speaker_int(key: str | None) -> int | None:
 
 
 def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: Path = PACK_DATA_DIR,
-                   pack_global: str = "ForeverVO_DataPack", sounds_dir: Path = SOUNDS_DIR, write_index: bool = True) -> dict:
+                   pack_global: str = "ForeverVO_DataPack", sounds_dir: Path = SOUNDS_DIR, write_index: bool = True,
+                   dirty: set[str] | None = None) -> dict:
     """Writes the pack tables for `items` whose audio exists under sounds_dir.
     Returns {"quests": n, "gossip": n, "npcs": n, "files": set(base names),
-    "narratorFiles": set(paths relative to Sounds/)}."""
+    "narratorFiles": set(paths relative to Sounds/)}.
+
+    `dirty` is the set of index keys this process has written since its last
+    save; the durations probed here join it, and only those keys are merged into
+    the index on disk (see save_sound_index)."""
+    if dirty is None:
+        dirty = set()
     present = {p.stem for p in sounds_dir.glob("*/*.mp3")}
     for name in present:
         if name not in sound_index:
+            # A file we have no record of, usually the other worker's, made since
+            # we last merged the disk. Its duration is enough for the tables; the
+            # rank rule in save_sound_index keeps this from replacing that
+            # worker's own record once it saves.
             sound_index[name] = {"d": probe_duration(sounds_dir / sound_folder(name) / f"{name}.mp3"), "v": None}
+            dirty.add(name)
 
     # Alternate narrator voices, one folder each under Quests and Gossip. A line
     # counts as available in a voice when its file is there, whoever generated it,
@@ -402,6 +535,7 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
             key = index_key(name, voice)
             if key not in sound_index:
                 sound_index[key] = {"d": probe_duration(sound_path(sound_folder(name), name, voice, sounds_dir)), "v": voice}
+                dirty.add(key)
 
     def duration_of(name: str) -> float:
         recorded = sound_index.get(name, 0.0)
@@ -416,12 +550,19 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
 
     for item in items:
         variants = item.variants()
-        available = [base for base, _ in variants if base in present]
-        if not available:
+        available = [v.base for v in variants if v.base in present]
+        # A line that mixes the speaker and the narrator also has parts, recorded
+        # only when every variant has every part; a line that is only a stage
+        # direction has parts and no whole-line file.
+        part_count = len(variants[0].parts)
+        parts_complete = part_count > 0 and all(
+            len(v.parts) == part_count and all(part_name(v.base, i) in present for i in range(1, part_count + 1))
+            for v in variants)
+        if not available and not parts_complete:
             continue
         used.update(available)
         gendered = len(variants) == 2
-        duration = max(duration_of(base) for base in available)
+        duration = round(max(duration_of(base) for base in available), 3) if available else None
         speaker = speaker_int(item.speaker_key)
         name = item.entry.get("name") or (item.npc or {}).get("name")
         if speaker is not None and name:
@@ -429,24 +570,73 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
 
         # The same line in the alternate narrator voices, each with its own
         # duration: voices differ in pace, and the text is paged against it.
+        # Only a line the narrator still reads: a speaker that gains a voice of
+        # its own (a dryad once a dryad clip exists) leaves its old alternates
+        # on disk until the generator removes them, and the addon would play
+        # one of those over the new voice for anyone with an alternate picked.
         alternates: dict[str, float] = {}
-        for voice, names in narrator_present.items():
-            spoken = [base for base, _ in variants if base in names]
+        for voice, names in narrator_present.items() if item.is_narrator else ():
+            spoken = [v.base for v in variants if v.base in names]
             if not spoken:
                 continue
             narrator_used.update(f"{item.subfolder}/Narrator/{voice}/{base}" for base in spoken)
             alternates[voice] = round(max(duration_of(index_key(base, voice)) for base in spoken), 3)
 
+        # Parts: {d, n} per part in reading order (n marks the narrator's), and
+        # for the narrator's parts the alternate voices' own durations by index.
+        parts_record: list[dict] | None = None
+        part_alternates: dict[str, dict[int, float]] = {}
+        if parts_complete:
+            parts_record = []
+            for index in range(1, part_count + 1):
+                names = [part_name(v.base, index) for v in variants]
+                used.update(names)
+                role = variants[0].parts[index - 1][0]
+                parts_record.append({"d": round(max(duration_of(n) for n in names), 3),
+                                     "n": True if role == "narrator" else None})
+                if role != "narrator":
+                    continue
+                for voice, voice_names in narrator_present.items():
+                    spoken = [n for n in names if n in voice_names]
+                    if not spoken:
+                        continue
+                    narrator_used.update(f"{item.subfolder}/Narrator/{voice}/{n}" for n in spoken)
+                    part_alternates.setdefault(voice, {})[index] = round(
+                        max(duration_of(index_key(n, voice)) for n in spoken), 3)
+
         if item.kind == "quests":
             quest_id = int(item.entry["questID"])
+            letter = QUEST_EVENTS[item.event]
             record = quests.setdefault(quest_id, {})
-            record[QUEST_EVENTS[item.event]] = round(duration, 3)
+            if duration is not None:
+                record[letter] = duration
+            if parts_record:
+                record[letter + "P"] = parts_record
+            for voice, durations in part_alternates.items():
+                narrator.setdefault(quest_id, {}).setdefault(voice, {})[letter + "P"] = durations
             if gendered:
-                # Only this event needs gender variants; other events for the
-                # same quest may still have a single shared recording.
-                record[QUEST_EVENTS[item.event] + "g"] = True
-            if speaker is not None and record.get("npc") is None:
-                record["npc"] = speaker
+                # $G branches per line, not per quest: quest 170's accept text
+                # branches and its complete text does not. One flag for the quest
+                # made FindQuest prefix m-/f- onto every event and look up a file
+                # that was never written, so the turn-in played nothing. Record the
+                # events that actually branched; Packs.lua still accepts `true`.
+                letters = set(record.get("g") or "") | {QUEST_EVENTS[item.event]}
+                record["g"] = "".join(sorted(letters))
+            # wa/wp/wc: the readers ingest.py still wants this event captured by
+            # (needs_of: "f" after a male reading of a line the client resolved
+            # a $G branch out of, "mf" when the reader is unknown). The addon
+            # exports the line again for such a reader although it is voiced.
+            if item.entry.get("needs"):
+                record["w" + letter] = item.entry["needs"]
+            # npc is the giver, which the addon shows for an accept text the
+            # client leaves unattributed (an item-started or shared quest);
+            # ender the turn-in speaker, for a progress or complete text at a
+            # game object. One field for both meant 172 item-started quests
+            # wore their turn-in NPC's face while the narrator read.
+            if speaker is not None:
+                field = "npc" if item.event == "accept" else "ender"
+                if record.get(field) is None:
+                    record[field] = speaker
             for voice, seconds in alternates.items():
                 narrator.setdefault(quest_id, {}).setdefault(voice, {})[QUEST_EVENTS[item.event]] = seconds
         else:
@@ -456,17 +646,23 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
                 "f": item.base_name,
                 "h": item.hash,
                 "t": item.raw_text.replace("\r", " ").replace("\n", " "),
-                "d": round(duration, 3),
+                "d": duration,
                 "g": gendered or None,
                 "n": alternates or None,   # voice -> duration, turned into indices below
+                "P": parts_record,
+                "nP": part_alternates or None,   # voice -> {part index -> duration}, likewise
             })
 
     # Only the voices this pack actually carries go in the menu, and the records
     # index into that list, so a voice added to config.py later cannot shift them.
     spoken_voices = {voice for alternates in narrator.values() for voice in alternates}
-    spoken_voices.update(voice for entries in gossip.values() for entry in entries for voice in (entry["n"] or {}))
+    spoken_voices.update(voice for entries in gossip.values() for entry in entries
+                         for voice in list(entry["n"] or {}) + list(entry["nP"] or {}))
     voices = [voice for voice in NARRATOR_VOICES[1:] if voice in spoken_voices]
 
+    for rec in quests.values():
+        if rec.get("ender") == rec.get("npc"):
+            rec.pop("ender", None)
     quest_lines = [f"\t[{qid}] = {lua_record(rec)}," for qid, rec in sorted(quests.items())]
     gossip_lines = []
     for speaker, entries in sorted(gossip.items()):
@@ -474,6 +670,8 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
         for entry in sorted(entries, key=lambda e: e["f"]):
             if entry["n"]:
                 entry["n"] = {voices.index(voice) + 1: seconds for voice, seconds in entry["n"].items()}
+            if entry["nP"]:
+                entry["nP"] = {voices.index(voice) + 1: durations for voice, durations in entry["nP"].items()}
             gossip_lines.append(f"\t\t{lua_record(entry)},")
         gossip_lines.append("\t},")
     npc_lines = [f"\t[{key}] = {lua_string(name)}," for key, name in sorted(npcs.items())]
@@ -491,7 +689,7 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
     write_table("Narrator.lua", "narrator", narrator_lines, data_dir, pack_global,
                 prelude=f"pack.narratorVoices = {{ {voice_list} }}\n")
     if write_index:
-        save_sound_index(sound_index)
+        save_sound_index(sound_index, dirty)
     gossip_count = sum(len(v) for v in gossip.values())
     narrated_gossip = sum(1 for entries in gossip.values() for entry in entries if entry["n"])
     narrator_note = (f", {len(narrator)} quests and {narrated_gossip} gossip lines in {len(voices)} alternate "
@@ -549,6 +747,7 @@ def main(argv: list[str]) -> int:
 
     todo: list[Target] = []
     skipped: dict[str, int] = {}
+    dirty: set[str] = set()   # index keys this process wrote since its last save
 
     stale: set[str] = set()
 
@@ -590,22 +789,54 @@ def main(argv: list[str]) -> int:
                 skipped["speaker unknown (play it to capture)"] = skipped.get("speaker unknown (play it to capture)", 0) + 1
                 continue
             item.voice = args.assume_voice
-        for base, text in item.variants():
+        for variant in item.variants():
+            base, text = variant.base, variant.text
+            candidates: list[Target] = []
             if not is_speakable(text):
                 skipped["unresolved markup"] = skipped.get("unresolved markup", 0) + 1
-                continue
-            candidates = [] if args.narrator_only else [Target(item, base, text, item.voice)]
-            if item.is_narrator:
-                candidates += [Target(item, base, text, voice, True) for voice in alternate_voices]
+            else:
+                if not args.narrator_only:
+                    candidates.append(Target(item, base, text, item.voice))
+                if item.is_narrator:
+                    candidates += [Target(item, base, text, voice, True) for voice in alternate_voices]
+            if not item.is_narrator and not args.dry_run and not args.reindex:
+                # A speaker that has gained a voice of its own (a species clip
+                # built, a capture naming the giver) leaves whole-line alternate
+                # narrator recordings behind. rebuild_tables no longer lists them,
+                # but they would still be probed into the index and shipped, and
+                # the line's own file is about to be regenerated anyway.
+                for voice in NARRATOR_VOICES[1:]:
+                    leftover = sound_path(item.subfolder, base, voice)
+                    if leftover.exists():
+                        leftover.unlink()
+                        sound_index.pop(index_key(base, voice), None)
+                        dirty.add(index_key(base, voice))
+                        skipped["stale narrator alternate removed"] = skipped.get("stale narrator alternate removed", 0) + 1
+            # A line that mixes the speaker and the narrator: the speaker's parts
+            # in their voice, each <stage direction> in the narrator's, and the
+            # narrator's parts again in every alternate narrator voice.
+            for index, (role, words) in enumerate(variant.parts, 1):
+                if not is_speakable(words):
+                    skipped["unresolved markup"] = skipped.get("unresolved markup", 0) + 1
+                    continue
+                part = part_name(base, index)
+                if role == "npc":
+                    if not args.narrator_only:
+                        candidates.append(Target(item, part, words, item.voice))
+                    continue
+                if not args.narrator_only:
+                    candidates.append(Target(item, part, words, NARRATOR_VOICE))
+                candidates += [Target(item, part, words, voice, True) for voice in alternate_voices]
             if args.reindex:
                 for target in candidates:
                     recorded = sound_index.get(target.key)
                     if isinstance(recorded, dict) and target.path.exists():
                         recorded["t"] = target.fingerprint
+                        dirty.add(target.key)
                 continue
             todo.extend(target for target in candidates if wanted(target))
     if args.reindex:
-        save_sound_index(sound_index)
+        save_sound_index(sound_index, dirty)
         stamped = sum(1 for value in sound_index.values() if isinstance(value, dict) and value.get("t"))
         print(f"reindexed: {stamped} of {len(sound_index)} entries now carry a text fingerprint")
         return 0
@@ -651,14 +882,15 @@ def main(argv: list[str]) -> int:
             t0 = time.time()
             duration = synth.speak(target.text, target.voice, target.path)
             sound_index[target.key] = {"d": duration, "v": target.voice, "t": target.fingerprint}
+            dirty.add(target.key)
             print(f"[{n}/{len(todo)}] {target.label} {duration:5.1f}s audio in {time.time() - t0:4.1f}s  [{target.voice}] {item.entry.get('title') or item.entry.get('name')}")
             if n % 25 == 0:
                 # Keep the pack tables current so a client restart picks up what exists so far.
                 # Sources are reloaded so files made by another run (e.g. a --captured pass) are included.
-                rebuild_tables(load_items(load_sources(), include_progress=True), sound_index)
+                rebuild_tables(load_items(load_sources(), include_progress=True), sound_index, dirty=dirty)
         print(f"generated {len(todo)} files in {(time.time() - started) / 60:.1f} min")
 
-    rebuild_tables(load_items(load_sources(), include_progress=True), sound_index)
+    rebuild_tables(load_items(load_sources(), include_progress=True), sound_index, dirty=dirty)
     return 0
 
 

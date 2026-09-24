@@ -61,7 +61,7 @@ def main():
     stage = ROOT / '.local-state/index-batches' / stamp
     stage.mkdir(parents=True)
     ffmpeg = next((ROOT / '.local-tools/ffmpeg').rglob('ffmpeg.exe'))
-    jobs = [(item, base, text) for item in selected for base, text in item.variants()]
+    jobs = [(item, variant.base, variant.text) for item in selected for variant in item.variants()]
     current_index = json.loads(SOUND_INDEX.read_text()) if SOUND_INDEX.exists() else {}
     reused = []
     if args.skip_current:
