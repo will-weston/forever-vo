@@ -89,6 +89,7 @@ function ForeverVO_OnCompartmentClick(_, buttonName, menuButtonFrame)
             root:CreateTitle("Forever Voiceover")
             root:CreateButton(Queue:IsPaused() and "Resume" or "Pause", function() Queue:TogglePause() end)
             root:CreateButton("Skip current line", function() Queue:Skip() end)
+            root:CreateButton("Open playback queue", function() ns.UI.QueueList:Show() end)
             root:CreateButton("Clear queue", function() Queue:Clear() end)
             root:CreateCheckbox("Show talking head", function() return ns.db.showHead end, function()
                 ns.db.showHead = not ns.db.showHead

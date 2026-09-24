@@ -1,0 +1,485 @@
+{
+  "formula": "native-profile-word-coverage-v1",
+  "references": {
+    "narrator": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\human-male-standard.wav",
+      "sha256": "3286a27b10537c60fa5a7f3e496d186f0aae17c97f5783b783c82f22261d8a97",
+      "word_count": 26,
+      "seconds": 6.74825,
+      "approved_pilot": false,
+      "reused_from": "Tirisfal neutral narration"
+    },
+    "npc-sound-142": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\silverpine-20260923\\references\\npc-sound-142.wav",
+      "sha256": "b39623a2082abfa042d226c990991d97f7e78704bcb7c1545fd2f764c1201354",
+      "word_count": 28,
+      "seconds": 14.669541666666667,
+      "approved_pilot": false
+    },
+    "npc-sound-145": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\silverpine-20260923\\references\\npc-sound-145.wav",
+      "sha256": "94cd72446295f29c9f2647d74626715f2667de640da4e32bcee740e284a88d0a",
+      "word_count": 27,
+      "seconds": 14.203583333333333,
+      "approved_pilot": false
+    },
+    "npc-sound-3773": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-3773.wav",
+      "sha256": "bf856a837f27cb3b038ec498b2b7a71e5a504b27761ed9717dc8abda9124dcac",
+      "word_count": 27,
+      "seconds": 14.788125,
+      "approved_pilot": false,
+      "reused_from": "Installed native-profile pack"
+    },
+    "npc-sound-68": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-68.wav",
+      "sha256": "78b8e4fe795982cab62b519ea1ab57d426fad45f1e3b23370aac6819bf649b6d",
+      "word_count": 27,
+      "seconds": 13.665791666666667,
+      "approved_pilot": false,
+      "reused_from": "Installed native-profile pack"
+    },
+    "npc-sound-71": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-71.wav",
+      "sha256": "99f14e567a6f868e9c54760f14c9917e434a25d1ad2cc632ee92298ad464da56",
+      "word_count": 35,
+      "seconds": 13.807375,
+      "approved_pilot": false,
+      "reused_from": "Installed native-profile pack"
+    },
+    "npc-sound-79": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\silverpine-20260923\\references\\npc-sound-79.wav",
+      "sha256": "cab02c6328017a7ccf78baf864e8e3bc9ccc0b82a9598721589f487724761aee",
+      "word_count": 25,
+      "seconds": 14.450916666666666,
+      "approved_pilot": false
+    },
+    "undead-female-standard": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-female-standard-source.wav",
+      "sha256": "92fc2030c406884030460a1254365031bbdd4699f36ed7d2bd8b0e01c1b63eaf",
+      "word_count": 24,
+      "seconds": 14.270291666666667,
+      "approved_pilot": true,
+      "reused_from": "Installed native-profile pack"
+    },
+    "undead-female-warrior": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\undead-female-warrior.wav",
+      "sha256": "84675bc1c8db31fda09f3f293caa84e27844a4f74281354f03105bade0636149",
+      "word_count": 25,
+      "seconds": 13.487625,
+      "approved_pilot": false,
+      "reused_from": "Installed native-profile pack"
+    },
+    "undead-male-dark": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-dark-source.wav",
+      "sha256": "8a73a3558bad857e215b61f4e1835fd24b44a55526407742e8cec8895cf9af96",
+      "word_count": 23,
+      "seconds": 14.410166666666667,
+      "approved_pilot": true,
+      "reused_from": "Installed native-profile pack"
+    },
+    "undead-male-standard": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-standard-source.wav",
+      "sha256": "5262264d850d8f32e62827c898debbee13381231f45bbf2e737fee4f136de7e9",
+      "word_count": 22,
+      "seconds": 13.661708333333333,
+      "approved_pilot": true,
+      "reused_from": "Installed native-profile pack"
+    },
+    "undead-male-warrior": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-warrior-source.wav",
+      "sha256": "86e4fa07c6c17ca3f2ec089ed0784a6c6a199678caac02e5851d15f094b20919",
+      "word_count": 27,
+      "seconds": 14.489208333333334,
+      "approved_pilot": true,
+      "reused_from": "Installed native-profile pack"
+    }
+  },
+  "npcs": {
+    "2934": {
+      "npc": "2934",
+      "name": "Keeper Bel'dugur",
+      "display_id": 5751,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1938": {
+      "npc": "1938",
+      "name": "Dalar Dawnweaver",
+      "display_id": 1278,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1952": {
+      "npc": "1952",
+      "name": "High Executor Hadrec",
+      "display_id": 3545,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "4444": {
+      "npc": "4444",
+      "name": "Deathstalker Vincent",
+      "display_id": 2689,
+      "npc_sound_id": "0",
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Vincent's completion describes his dead body; use narration, not a speaking corpse.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1937": {
+      "npc": "1937",
+      "name": "Apothecary Renferrel",
+      "display_id": 1661,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "5204": {
+      "npc": "5204",
+      "name": "Apothecary Zinge",
+      "display_id": 4056,
+      "npc_sound_id": "79",
+      "greeting_kit": 6052,
+      "farewell_kit": 6053,
+      "profile": "npc-sound-79",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "5543": {
+      "npc": "5543",
+      "name": "Clarice Foster",
+      "display_id": 3371,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "farewell_kit": 6047,
+      "profile": "undead-female-standard",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "-24776": {
+      "npc": "-24776",
+      "name": "Yuriv's Tombstone",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "3448": {
+      "npc": "3448",
+      "name": "Tonga Runetotem",
+      "display_id": 3914,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "8385": {
+      "npc": "8385",
+      "name": "Mura Runetotem",
+      "display_id": 7615,
+      "npc_sound_id": "71",
+      "greeting_kit": 6058,
+      "farewell_kit": 6059,
+      "profile": "npc-sound-71",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1950": {
+      "npc": "1950",
+      "name": "Rane Yorick",
+      "display_id": 3540,
+      "npc_sound_id": "81",
+      "greeting_kit": 6049,
+      "farewell_kit": 6050,
+      "profile": "undead-female-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1951": {
+      "npc": "1951",
+      "name": "Quinn Yorick",
+      "display_id": 3541,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1978": {
+      "npc": "1978",
+      "name": "Deathstalker Erland",
+      "display_id": 2684,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "-1593": {
+      "npc": "-1593",
+      "name": "Corpse Laden Boat",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1499": {
+      "npc": "1499",
+      "name": "Magistrate Sevren",
+      "display_id": 3514,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2050": {
+      "npc": "2050",
+      "name": "Raleigh Andrean",
+      "display_id": 4011,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "1498": {
+      "npc": "1498",
+      "name": "Bethor Iceshard",
+      "display_id": 4055,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2055": {
+      "npc": "2055",
+      "name": "Master Apothecary Faranell",
+      "display_id": 1680,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "farewell_kit": 6037,
+      "profile": "undead-male-standard",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2058": {
+      "npc": "2058",
+      "name": "Deathstalker Faerleia",
+      "display_id": 1679,
+      "npc_sound_id": "81",
+      "greeting_kit": 6049,
+      "farewell_kit": 6050,
+      "profile": "undead-female-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "character:alaric": {
+      "npc": "-1599",
+      "name": "Alaric",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "undead-male-standard",
+      "fallback": "Alaric speaks through an item and objects; no native NPC greeting is available. Editorial casting uses the existing undead male standard family consistently across his five spoken stages.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "-1599": {
+      "npc": "-1599",
+      "name": "Shallow Grave",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2121": {
+      "npc": "2121",
+      "name": "Shadow Priest Allister",
+      "display_id": 1948,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "-1627": {
+      "npc": "-1627",
+      "name": "Dalaran Crate",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "-112888": {
+      "npc": "-112888",
+      "name": "Dusty Shelf",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2216": {
+      "npc": "2216",
+      "name": "Apothecary Lydon",
+      "display_id": 1660,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "farewell_kit": 6043,
+      "profile": "undead-male-dark",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "6389": {
+      "npc": "6389",
+      "name": "Deathguard Podrig",
+      "display_id": 5345,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "2226": {
+      "npc": "2226",
+      "name": "Karos Razok",
+      "display_id": 3832,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "farewell_kit": 6037,
+      "profile": "undead-male-standard",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "4556": {
+      "npc": "4556",
+      "name": "Gordon Wendham",
+      "display_id": 2629,
+      "npc_sound_id": "145",
+      "greeting_kit": 6667,
+      "farewell_kit": 6037,
+      "profile": "npc-sound-145",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "4551": {
+      "npc": "4551",
+      "name": "Michael Garrett",
+      "display_id": 2638,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "250686": {
+      "npc": "250686",
+      "name": "Tabitha Heartweaver",
+      "display_id": 136424,
+      "npc_sound_id": "142",
+      "greeting_kit": 6664,
+      "farewell_kit": 6047,
+      "profile": "npc-sound-142",
+      "fallback": null,
+      "evidence": "https://www.wowhead.com/forever/npc=250686/tabitha-heartweaver → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "248840": {
+      "npc": "248840",
+      "name": "Trevan Rol",
+      "display_id": 129405,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "farewell_kit": 6037,
+      "profile": "undead-male-standard",
+      "fallback": null,
+      "evidence": "https://www.wowhead.com/forever/npc=248840/trevan-rol → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "259611": {
+      "npc": "259611",
+      "name": "Deathguard Baldren",
+      "display_id": 141689,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "farewell_kit": 6040,
+      "profile": "undead-male-warrior",
+      "fallback": null,
+      "evidence": "https://www.wowhead.com/forever/npc=259611/deathguard-baldren → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "None": {
+      "npc": null,
+      "name": "Unknown",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "fallback": "Item, object, grave, or corpse description.",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "248755": {
+      "npc": "248755",
+      "name": "Lumina Windsinger",
+      "display_id": 131648,
+      "npc_sound_id": "3773",
+      "greeting_kit": 353056,
+      "farewell_kit": 353058,
+      "profile": "npc-sound-3773",
+      "fallback": null,
+      "evidence": "https://www.wowhead.com/forever/npc=248755/lumina-windsinger → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    },
+    "259620": {
+      "npc": "259620",
+      "name": "Lumina Windsinger",
+      "display_id": 131648,
+      "npc_sound_id": "3773",
+      "greeting_kit": 353056,
+      "farewell_kit": 353058,
+      "profile": "npc-sound-3773",
+      "fallback": null,
+      "evidence": "https://www.wowhead.com/forever/npc=259620/lumina-windsinger → cached CreatureDisplayInfo.NPCSoundID → NPCSounds"
+    }
+  }
+}

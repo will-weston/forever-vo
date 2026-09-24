@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS_DIR = ROOT / "tools"
-DATA_DIR = TOOLS_DIR / "data"
+DATA_DIR = Path(os.environ.get("FOREVER_VO_DATA_DIR", TOOLS_DIR / "data"))
 DB2_DIR = DATA_DIR / "db2"
 VOICES_DIR = TOOLS_DIR / "voices"
 CAPTURE_JSON = DATA_DIR / "capture.json"

@@ -1,81 +1,28 @@
 local _, ns = ...
 local Util, Queue = ns.Util, ns.Queue
 
---[[
-The talking head: a frame that mirrors Blizzard's own TalkingHeadFrame
-(Blizzard_FrameXML/TalkingHeadUI.xml) in size, atlases, anchors and fade
-animations, so it reads as part of the client. Shows the current queue item
-with the speaker's model, name, title, and the spoken text paged in time with
-the audio. Right-click skips, the X clears the queue.
-]]
+-- A compact quest dialog: native circular portrait and name bar above
+-- parchment, with spoken text paged in time with the audio.
+-- Right-click or the X skips the current line.
 
-local FRAME_WIDTH, FRAME_HEIGHT = 570, 155
-local MODEL_SIZE = 115
-local TALK_ANIMATION = 60
+local FRAME_WIDTH, FRAME_HEIGHT = 500, 239
+local FOOTER_HEIGHT = 34
 local PAGE_CHARS = 330
-
-local TEXTURE_KIT_FORMATS = {
-    TextBackground = "%s-TextBackground",
-    Portrait = "%s-PortraitFrame",
-    PortraitBg = "%s-PortraitBg",
-}
-local DEFAULT_ATLASES = {
-    TextBackground = "TalkingHeads-TextBackground",
-    Portrait = "TalkingHeads-Alliance-PortraitFrame",
-    PortraitBg = "TalkingHeads-PortraitBg",
-}
--- Name / Title / Text colors per texture kit. Blizzard's values for Name and
--- Text; Title is ours and must read on both the dark panel and the parchment.
-local FONT_COLORS = {
-    ["TalkingHeads-Horde"]    = { Name = CreateColor(0.28, 0.02, 0.02), Title = CreateColor(0.25, 0.15, 0.05), Text = CreateColor(0, 0, 0), Shadow = CreateColor(0, 0, 0, 0) },
-    ["TalkingHeads-Alliance"] = { Name = CreateColor(0.02, 0.17, 0.33), Title = CreateColor(0.25, 0.15, 0.05), Text = CreateColor(0, 0, 0), Shadow = CreateColor(0, 0, 0, 0) },
-    ["TalkingHeads-Neutral"]  = { Name = CreateColor(0.33, 0.16, 0.02), Title = CreateColor(0.25, 0.15, 0.05), Text = CreateColor(0, 0, 0), Shadow = CreateColor(0, 0, 0, 0) },
-    ["Normal"]                = { Name = CreateColor(1, 0.82, 0.02),    Title = CreateColor(0.85, 0.85, 0.85), Text = CreateColor(1, 1, 1), Shadow = CreateColor(0, 0, 0, 1) },
-}
 
 local TalkingHead = {
     displayed = nil,
     pageTimers = {},
+    portraits = {},
 }
 ns.UI.TalkingHead = TalkingHead
 
-local function AtlasExists(atlas)
-    return atlas ~= nil and C_Texture.GetAtlasExists(atlas)
-end
-
-local function CurrentTextureKit()
-    if not ns.db.factionHead then
-        return "Normal" -- Blizzard's default dark talking head
-    end
-    local faction = UnitFactionGroup("player")
-    local kit = faction and ("TalkingHeads-" .. faction) or "TalkingHeads-Neutral"
-    if AtlasExists(format(TEXTURE_KIT_FORMATS.TextBackground, kit)) then
-        return kit
-    end
-    return "Normal"
-end
-
-local function Alpha(group, target, fromAlpha, toAlpha, duration, delay)
+local function Alpha(group, target, fromAlpha, toAlpha, duration)
     local anim = group:CreateAnimation("Alpha")
     anim:SetTarget(target)
     anim:SetFromAlpha(fromAlpha)
     anim:SetToAlpha(toAlpha)
     anim:SetDuration(duration)
-    anim:SetStartDelay(delay or 0)
     anim:SetOrder(1)
-end
-
-local function Scale(group, target, fromX, fromY, toX, toY, duration, delay, origin)
-    local anim = group:CreateAnimation("Scale")
-    anim:SetTarget(target)
-    anim:SetScaleFrom(fromX, fromY)
-    anim:SetScaleTo(toX, toY)
-    anim:SetDuration(duration)
-    anim:SetStartDelay(delay or 0)
-    anim:SetOrder(1)
-    if origin then
-        anim:SetOrigin(origin, 0, 0)
-    end
 end
 
 function TalkingHead.EventIcon(item)
@@ -105,10 +52,15 @@ function TalkingHead:Init()
 
     Queue:RegisterCallback("OnChanged", self.Update, self)
     Queue:RegisterCallback("OnPause", self.UpdatePause, self)
+    Queue:RegisterCallback("OnPlay", function(_, item)
+        if self.displayed == item then
+            self:ShowPagedText(item)
+        end
+    end, self)
 end
 
 function TalkingHead:CreateFrame()
-    local frame = CreateFrame("Button", "ForeverVOTalkingHead", UIParent)
+    local frame = CreateFrame("Button", "ForeverVOTalkingHead", UIParent, "PortraitFrameTemplate")
     self.frame = frame
     frame:SetSize(FRAME_WIDTH, FRAME_HEIGHT)
     frame:SetFrameStrata("HIGH")
@@ -120,7 +72,7 @@ function TalkingHead:CreateFrame()
 
     function frame:ResetPosition()
         self:ClearAllPoints()
-        self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 96) -- where Blizzard puts TalkingHeadFrame
+        self:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 96)
     end
     frame:ResetPosition()
     frame:SetUserPlaced(true)
@@ -139,215 +91,143 @@ function TalkingHead:CreateFrame()
         self:StopMovingOrSizing()
     end)
 
-    frame.TextBackground = frame:CreateTexture(nil, "BACKGROUND")
-    frame.TextBackground:SetPoint("CENTER")
-    frame.TextBackground:SetAlpha(0.01)
+    -- The same title bar, round portrait border, and rock surround as QuestFrame.
+    frame.TextBackground = frame:CreateTexture(nil, "BACKGROUND", nil, -1)
+    frame.TextBackground:SetPoint("TOPLEFT", 7, -62)
+    frame.TextBackground:SetPoint("BOTTOMRIGHT", -7, 9 + FOOTER_HEIGHT)
 
-    frame.Portrait = frame:CreateTexture(nil, "OVERLAY")
-    frame.Portrait:SetPoint("TOPLEFT", 5, -6)
-    frame.Portrait:SetAlpha(0.01)
-
-    local function Glow(atlas, subLevel)
-        local tex = frame:CreateTexture(nil, "OVERLAY", nil, subLevel or 0)
-        tex:SetAtlas(atlas, true)
-        tex:SetBlendMode("ADD")
-        tex:SetAlpha(0.01)
-        return tex
-    end
-    frame.Sheen = Glow("TalkingHeads-Glow-Sheen")
-    frame.TextSheen = Glow("TalkingHeads-Glow-TextSheen")
-    frame.GlowTop = Glow("TalkingHeads-Glow-TopBarGlow", 1)
-    frame.GlowTop:SetPoint("CENTER", frame.Portrait, "TOP", 0, -11)
-    frame.GlowLeft = Glow("TalkingHeads-Glow-SideBarGlow", 1)
-    frame.GlowLeft:SetPoint("CENTER", frame.Portrait, "LEFT", 11, 25)
-    frame.GlowRight = Glow("TalkingHeads-Glow-SideBarGlow", 1)
-    frame.GlowRight:SetPoint("CENTER", frame.Portrait, "RIGHT", -11, 25)
-
-    frame.CloseButton = CreateFrame("Button", nil, frame, "UIPanelCloseButtonNoScripts")
-    frame.CloseButton:SetPoint("TOPRIGHT", -12, -12)
-    frame.CloseButton:SetAlpha(0.01)
     frame.CloseButton:SetScript("OnClick", function()
         PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
-        Queue:Clear()
+        Queue:Skip()
     end)
+    frame.CloseButton:SetScript("OnEnter", function(button)
+        GameTooltip:SetOwner(button, "ANCHOR_TOP")
+        GameTooltip:SetText("Close")
+        GameTooltip:Show()
+    end)
+    frame.CloseButton:SetScript("OnLeave", GameTooltip_Hide)
 end
 
 function TalkingHead:CreatePortrait()
     local frame = self.frame
-    local model = CreateFrame("PlayerModel", nil, frame)
-    frame.Model = model
-    model:SetSize(MODEL_SIZE, MODEL_SIZE)
-    model:SetPoint("TOPLEFT", 21, -21)
-    model:SetAlpha(0.01)
+    frame.Portrait = frame.PortraitContainer.portrait
+    frame.Portrait:SetTexture(ns.mediaPath .. "Book")
+end
 
-    model.PortraitBg = model:CreateTexture(nil, "BACKGROUND")
-    model.PortraitBg:SetPoint("TOPLEFT")
-    model.PortraitBg:SetAlpha(0.01)
-
-    frame.Book = frame:CreateTexture(nil, "ARTWORK")
-    frame.Book:SetTexture(ns.mediaPath .. "Book")
-    frame.Book:SetSize(MODEL_SIZE - 20, MODEL_SIZE - 20)
-    frame.Book:SetPoint("CENTER", model, "CENTER")
-    frame.Book:Hide()
-
-    model:SetScript("OnModelLoaded", function(self)
-        pcall(self.SetPortraitZoom, self, 1)
-        pcall(self.SetCamDistanceScale, self, 1)
-        pcall(self.SetFacing, self, 0)
-        if self.talking then
-            self:SetAnimation(TALK_ANIMATION)
+function TalkingHead:CachePortraits()
+    -- Snapshot queued speakers while their unit is available. A texture retains
+    -- its portrait after the dialog closes or the player targets someone else.
+    for _, unit in ipairs({ "questnpc", "npc", "target" }) do
+        local key = UnitExists(unit) and Util.SpeakerKeyFromGUID(UnitGUID(unit))
+        if key and Util.IsCreatureKey(key) and not self.portraits[key] then
+            for i = 1, Queue:Size() do
+                if Queue:Get(i).speakerKey == key then
+                    local portrait = self.frame.PortraitContainer:CreateTexture(nil, "OVERLAY")
+                    portrait:SetAllPoints(self.frame.Portrait)
+                    portrait:AddMaskTexture(self.frame.PortraitContainer.CircleMask)
+                    portrait:Hide()
+                    SetPortraitTexture(portrait, unit)
+                    self.portraits[key] = portrait
+                    break
+                end
+            end
         end
-    end)
-    model:SetScript("OnAnimFinished", function(self)
-        self:SetAnimation(self.talking and TALK_ANIMATION or 0)
-    end)
-
-    function model:ShowCreature(creatureID)
-        self.talking = true
-        if self.creatureID ~= creatureID then
-            self.creatureID = creatureID
-            self:SetCreature(creatureID)
-        else
-            self:SetAnimation(TALK_ANIMATION)
-        end
-    end
-
-    function model:StopTalking()
-        self.talking = false
     end
 end
 
 function TalkingHead:CreateText()
     local frame = self.frame
 
-    frame.Name = frame:CreateFontString(nil, "ARTWORK")
-    frame.Name:SetFontObject("Fancy22Font")
-    frame.Name:SetJustifyH("LEFT")
-    frame.Name:SetPoint("TOPLEFT", frame.Portrait, "TOPRIGHT", 2, -19)
-    frame.Name:SetPoint("RIGHT", -42, 0)
-    frame.Name:SetAlpha(0.01)
+    frame.Name = frame.TitleContainer.TitleText
+    frame:SetTitleOffsets(64, -32)
+    frame.Name:SetFontObject("GameFontNormal")
+    frame.Name:SetJustifyH("CENTER")
 
     frame.Title = frame:CreateFontString(nil, "ARTWORK")
-    frame.Title:SetFontObject("GameFontNormal")
+    frame.Title:SetFontObject("QuestTitleFont")
     frame.Title:SetJustifyH("LEFT")
-    frame.Title:SetPoint("TOPLEFT", frame.Name, "BOTTOMLEFT", 1, -1)
-    frame.Title:SetPoint("RIGHT", -42, 0)
-    frame.Title:SetAlpha(0.01)
+    frame.Title:SetPoint("TOPLEFT", 19, -72)
+    frame.Title:SetPoint("RIGHT", -19, 0)
+    frame.Title:SetWordWrap(false)
 
     frame.Text = frame:CreateFontString(nil, "ARTWORK")
-    frame.Text:SetFontObject("GameFontHighlightLarge")
+    frame.Text:SetFontObject("QuestFont")
     frame.Text:SetJustifyH("LEFT")
     frame.Text:SetJustifyV("TOP")
-    frame.Text:SetPoint("TOPLEFT", frame.Title, "BOTTOMLEFT", 0, -4)
-    frame.Text:SetPoint("BOTTOMRIGHT", -42, 34)
-    frame.Text:SetAlpha(0.01)
+    frame.Text:SetPoint("TOPLEFT", frame.Title, "BOTTOMLEFT", 0, -6)
+    frame.Text:SetPoint("BOTTOMRIGHT", -19, 19 + FOOTER_HEIGHT)
+    frame.Text:SetWordWrap(true)
     if AutoScalingFontStringMixin then
         Mixin(frame.Text, AutoScalingFontStringMixin)
         frame.Text.minLineHeight = 12
     end
-
-    frame.Sheen:SetPoint("LEFT", frame.Name, "LEFT", -48, 0)
-    frame.TextSheen:SetPoint("LEFT", frame.Text, "LEFT", -48, 16)
 end
 
 function TalkingHead:CreateControls()
     local frame = self.frame
 
-    frame.QueueText = frame:CreateFontString(nil, "ARTWORK")
-    frame.QueueText:SetFontObject("GameFontDisableSmall")
-    frame.QueueText:SetJustifyH("LEFT")
-    frame.QueueText:SetPoint("BOTTOMLEFT", frame.Text, "BOTTOMLEFT", 0, -22)
-
-    local function Button(text, width, onClick)
-        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-        button:SetSize(width, 20)
-        button:SetText(text)
-        button:SetScript("OnClick", function()
+    -- Keep playback together in the quest-style footer; the title bar is for
+    -- the speaker and close button.
+    local skip = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.SkipButton = skip
+    skip:SetSize(86, 24)
+    skip:SetPoint("BOTTOMRIGHT", -14, 12)
+    skip:SetText("Skip")
+    skip:SetScript("OnClick", function()
+        if Queue:Current() then
             PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-            onClick()
-        end)
-        return button
-    end
-
-    frame.QueueButton = Button("Queue", 62, function()
-        ns.UI.QueueList:Toggle()
+            Queue:Skip()
+        end
     end)
-    frame.QueueButton:SetPoint("BOTTOMRIGHT", -44, 12)
-
-    frame.SkipButton = Button("Skip", 54, function()
-        Queue:Skip()
+    skip:SetScript("OnEnter", function(button)
+        GameTooltip:SetOwner(button, "ANCHOR_TOP")
+        GameTooltip:SetText("Skip")
+        GameTooltip:Show()
     end)
-    frame.SkipButton:SetPoint("RIGHT", frame.QueueButton, "LEFT", -4, 0)
+    skip:SetScript("OnLeave", GameTooltip_Hide)
+    skip:SetScript("OnHide", function()
+        if GameTooltip:GetOwner() == skip then GameTooltip:Hide() end
+    end)
 
-    frame.PauseButton = Button("Pause", 66, function()
+    local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.PauseButton = button
+    button:SetSize(86, 24)
+    button:SetPoint("RIGHT", skip, "LEFT", -8, 0)
+    button:SetText("Pause")
+    button:SetScript("OnClick", function()
+        PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
         Queue:TogglePause()
     end)
-    frame.PauseButton:SetPoint("RIGHT", frame.SkipButton, "LEFT", -4, 0)
+    button:SetScript("OnEnter", function()
+        self:ShowPauseTooltip()
+    end)
+    button:SetScript("OnLeave", GameTooltip_Hide)
+    button:SetScript("OnHide", function()
+        if GameTooltip:GetOwner() == button then GameTooltip:Hide() end
+    end)
+end
+
+function TalkingHead:ShowPauseTooltip()
+    local button = self.frame.PauseButton
+    GameTooltip:SetOwner(button, "ANCHOR_TOP")
+    GameTooltip:SetText(Queue:IsPaused() and "Play from beginning" or "Pause")
+    GameTooltip:Show()
 end
 
 function TalkingHead:CreateAnimations()
     local frame = self.frame
-
     local fadeIn = frame:CreateAnimationGroup()
     fadeIn:SetToFinalAlpha(true)
-    Alpha(fadeIn, frame.Model, 0, 1, 0.75)
-    Alpha(fadeIn, frame.Model.PortraitBg, 0, 1, 0.75)
-    Alpha(fadeIn, frame.Portrait, 0, 1, 0.75)
-    Alpha(fadeIn, frame.TextBackground, 0, 1, 0.75, 0.4)
-    Alpha(fadeIn, frame.Name, 0, 1, 0.25)
-    Alpha(fadeIn, frame.Title, 0, 1, 0.25)
-    Alpha(fadeIn, frame.Text, 0, 1, 0.25)
-    Alpha(fadeIn, frame.CloseButton, 0, 1, 0.75, 0.75)
-    Alpha(fadeIn, frame.GlowTop, 0, 0.7, 0.25, 0.15)
-    Scale(fadeIn, frame.GlowTop, 0.25, 1, 1.5, 1, 0.25, 0.15)
-    Alpha(fadeIn, frame.GlowTop, 0.7, 0, 0.5, 0.4)
-    Alpha(fadeIn, frame.GlowLeft, 0, 0.7, 0.25, 0.35)
-    Scale(fadeIn, frame.GlowLeft, 1, 0.5, 1, 1.6, 0.7, 0.35, "TOP")
-    Alpha(fadeIn, frame.GlowLeft, 0.7, 0, 0.25, 0.85)
-    Alpha(fadeIn, frame.GlowRight, 0, 0.7, 0.25, 0.35)
-    Scale(fadeIn, frame.GlowRight, 1, 0.5, 1, 1.6, 0.7, 0.35, "TOP")
-    Alpha(fadeIn, frame.GlowRight, 0.7, 0, 0.25, 0.95)
-    Alpha(fadeIn, frame.Sheen, 0, 0.7, 0.5, 0.5)
-    Scale(fadeIn, frame.Sheen, 0.25, 1, 1, 1, 0.25, 0.5, "LEFT")
-    Alpha(fadeIn, frame.Sheen, 0.7, 0, 0.5, 1)
-    Alpha(fadeIn, frame.TextSheen, 0, 0.7, 0.5, 0.75)
-    Scale(fadeIn, frame.TextSheen, 0.25, 1, 1, 1, 0.25, 0.75, "LEFT")
-    Alpha(fadeIn, frame.TextSheen, 0.7, 0, 0.5, 1.25)
+    Alpha(fadeIn, frame, 0, 1, 0.15)
     frame.FadeIn = fadeIn
-
-    local newLine = frame:CreateAnimationGroup()
-    newLine:SetToFinalAlpha(true)
-    Alpha(newLine, frame.Sheen, 0, 0.7, 0.5, 0.2)
-    Scale(newLine, frame.Sheen, 0.25, 1, 1, 1, 0.25, 0.2, "LEFT")
-    Alpha(newLine, frame.Sheen, 0.7, 0, 0.5, 0.7)
-    Alpha(newLine, frame.TextSheen, 0, 0.7, 0.5, 0.45)
-    Scale(newLine, frame.TextSheen, 0.25, 1, 1, 1, 0.25, 0.45, "LEFT")
-    Alpha(newLine, frame.TextSheen, 0.7, 0, 0.5, 0.95)
-    frame.NewLine = newLine
-
-    local textOut = frame:CreateAnimationGroup()
-    textOut:SetToFinalAlpha(true)
-    Alpha(textOut, frame.Name, 1, 0, 0.25)
-    Alpha(textOut, frame.Title, 1, 0, 0.25)
-    Alpha(textOut, frame.Text, 1, 0, 0.25)
-    frame.TextOut = textOut
-
-    local textIn = frame:CreateAnimationGroup()
-    textIn:SetToFinalAlpha(true)
-    Alpha(textIn, frame.Name, 0, 1, 0.25)
-    Alpha(textIn, frame.Title, 0, 1, 0.25)
-    Alpha(textIn, frame.Text, 0, 1, 0.25)
-    frame.TextIn = textIn
 
     local close = frame:CreateAnimationGroup()
     close:SetToFinalAlpha(true)
-    for _, region in ipairs({ frame.Model, frame.Model.PortraitBg, frame.Portrait, frame.TextBackground, frame.Name, frame.Title, frame.Text, frame.CloseButton }) do
-        Alpha(close, region, 1, 0, 1)
-    end
+    Alpha(close, frame, 1, 0, 0.2)
     close:SetScript("OnFinished", function()
         frame:Hide()
+        frame:SetAlpha(1)
         frame.isClosing = nil
-        ns.UI.QueueList:Update()
     end)
     frame.Close = close
 end
@@ -358,26 +238,19 @@ end
 
 function TalkingHead:ApplyTextureKit()
     local frame = self.frame
-    local kit = CurrentTextureKit()
-    local regions = {
-        TextBackground = frame.TextBackground,
-        Portrait = frame.Portrait,
-        PortraitBg = frame.Model.PortraitBg,
-    }
-    for key, region in pairs(regions) do
-        local atlas = kit ~= "Normal" and format(TEXTURE_KIT_FORMATS[key], kit) or nil
-        if not AtlasExists(atlas) then
-            atlas = DEFAULT_ATLASES[key]
-        end
-        region:SetAtlas(atlas, true)
+    local parchment = ns.db.factionHead ~= false
+    if parchment then
+        frame.TextBackground:SetAtlas("QuestBG-Parchment")
+        frame.Title:SetTextColor(0.18, 0.12, 0.06)
+        frame.Text:SetTextColor(0.12, 0.08, 0.04)
+    else
+        frame.TextBackground:SetColorTexture(0.08, 0.07, 0.06, 1)
+        frame.Title:SetTextColor(1, 0.82, 0.02)
+        frame.Text:SetTextColor(0.95, 0.92, 0.85)
     end
-    local colors = FONT_COLORS[kit] or FONT_COLORS["Normal"]
-    frame.Name:SetTextColor(colors.Name:GetRGB())
-    frame.Name:SetShadowColor(colors.Shadow:GetRGBA())
-    frame.Text:SetTextColor(colors.Text:GetRGB())
-    frame.Text:SetShadowColor(colors.Shadow:GetRGBA())
-    frame.Title:SetTextColor(colors.Title:GetRGB())
-    frame.Title:SetShadowColor(colors.Shadow:GetRGBA())
+    frame.Name:SetTextColor(1, 0.82, 0.02)
+    frame.Title:SetShadowColor(0, 0, 0, parchment and 0 or 1)
+    frame.Text:SetShadowColor(0, 0, 0, parchment and 0 or 1)
 end
 
 function TalkingHead:ApplySettings()
@@ -407,7 +280,7 @@ function TalkingHead:ShowPagedText(item)
     local frame = self.frame
     local pages = Util.Paginate(item.text, PAGE_CHARS)
     frame.Text:SetText(pages[1])
-    if #pages == 1 or not item.duration then
+    if #pages == 1 or not item.duration or Queue:IsPaused() then
         return
     end
     local total = 0
@@ -428,66 +301,42 @@ function TalkingHead:ShowPagedText(item)
 end
 
 function TalkingHead:SetPortrait(item)
-    local frame = self.frame
-    local model = frame.Model
-    frame.Book:Hide()
-    if item.speakerKey and Util.IsCreatureKey(item.speakerKey) then
-        model:Show()
-        model:ShowCreature(item.speakerKey)
-    else
-        model:StopTalking()
-        model:ClearModel()
-        model.creatureID = nil
-        model:Hide()
-        frame.Book:Show()
-    end
+    if self.activePortrait then self.activePortrait:Hide() end
+    local portrait = item.speakerKey and self.portraits[item.speakerKey]
+    self.activePortrait = portrait
+    self.frame.Portrait:SetShown(not portrait)
+    if portrait then portrait:Show() end
 end
 
 function TalkingHead:Present(item)
     local frame = self.frame
     local wasShown = frame:IsShown() and not frame.isClosing
-    local sameSpeaker = self.displayed and self.displayed.name == item.name
 
     frame.Close:Stop()
     frame.isClosing = nil
+    frame:SetAlpha(1)
     self.displayed = item
     self:SetPortrait(item)
-
-    local name = item.name or ""
-    local title = item.title or ""
-    if not wasShown then
-        frame.Name:SetText(name)
-        frame.Title:SetText(title)
-        self:ShowPagedText(item)
-        frame:Show()
-        frame.FadeIn:Play()
-    else
-        frame.TextOut:Play()
-        C_Timer.After(0.25, function()
-            if self.displayed ~= item then return end
-            frame.Name:SetText(name)
-            frame.Title:SetText(title)
-            self:ShowPagedText(item)
-            frame.TextIn:Play()
-            if not sameSpeaker then
-                frame.NewLine:Play()
-            end
-        end)
-    end
+    frame.Name:SetText(item.name or "")
+    frame.Title:SetText(item.title or "")
+    self:ShowPagedText(item)
+    frame:Show()
+    if not wasShown then frame.FadeIn:Play() end
 end
 
 function TalkingHead:CloseFrame()
     local frame = self.frame
     self.displayed = nil
     self:CancelPageTimers()
-    frame.Model:StopTalking()
     if frame:IsShown() and not frame.isClosing then
         frame.isClosing = true
+        frame.FadeIn:Stop()
         frame.Close:Play()
     end
 end
 
 function TalkingHead:Update()
+    self:CachePortraits()
     local frame = self.frame
     local current = Queue:Current()
 
@@ -495,22 +344,24 @@ function TalkingHead:Update()
         self:CloseFrame()
     elseif current ~= self.displayed then
         self:Present(current)
+    else
+        self:SetPortrait(current)
     end
 
-    local remaining = Queue:Size() - 1
-    frame.QueueText:SetText(remaining > 0 and format("%d more queued", remaining) or "")
-    frame.SkipButton:SetEnabled(Queue:Size() > 0)
+    frame.CloseButton:SetEnabled(current ~= nil)
+    frame.PauseButton:SetEnabled(current ~= nil)
+    frame.SkipButton:SetEnabled(current ~= nil)
     self:UpdatePause(Queue:IsPaused())
-    ns.UI.QueueList:Update()
 end
 
 function TalkingHead:UpdatePause(paused)
     local frame = self.frame
-    frame.PauseButton:SetText(paused and "Resume" or "Pause")
+    frame.PauseButton:SetText(paused and "Play" or "Pause")
+    if frame.PauseButton:IsMouseOver() and GameTooltip:GetOwner() == frame.PauseButton then
+        self:ShowPauseTooltip()
+    end
     if paused then
-        frame.Model:StopTalking()
-    elseif self.displayed then
-        self:SetPortrait(self.displayed)
+        self:CancelPageTimers()
     end
 end
 

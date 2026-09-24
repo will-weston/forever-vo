@@ -18,6 +18,8 @@ import requests
 
 from config import BETA_BUILD, DB2_DIR, GENDER_DICT, RACE_DICT, VOICES_DIR, WAGO_BASE, ZONE_RACE_HINTS
 
+_casc_build_unavailable = False
+
 
 def db2_path(table: str, build: str = BETA_BUILD) -> Path:
     return DB2_DIR / build / f"{table}.csv"
@@ -48,7 +50,15 @@ def fetch_file(fdid: int, dest: Path, build: str = BETA_BUILD) -> Path:
     if dest.exists():
         return dest
     dest.parent.mkdir(parents=True, exist_ok=True)
-    response = requests.get(f"{WAGO_BASE}/api/casc/{fdid}", params={"version": build}, timeout=180)
+    global _casc_build_unavailable
+    url = f"{WAGO_BASE}/api/casc/{fdid}"
+    response = requests.get(url, params=None if _casc_build_unavailable else {"version": build}, timeout=30)
+    if response.status_code >= 500 and not _casc_build_unavailable:
+        # Some beta build archives are unavailable while the same FileDataID
+        # remains downloadable from the current archive.
+        response = requests.get(url, timeout=30)
+        if response.ok:
+            _casc_build_unavailable = True
     response.raise_for_status()
     if response.headers.get("content-type", "").startswith("application/json"):
         raise FileNotFoundError(f"FileDataID {fdid} not in build {build}: {response.text}")

@@ -76,13 +76,13 @@ local function QueueQuest(event, text)
         speaker = speaker, found = path ~= nil, pack = pack,
     })
 
-    if not path then
-        NotifyUnvoiced(format("\"%s\" (%s)", title or questID, event), format("q%d-%s", questID, event))
-        return
-    end
     if (event == "accept" and not ns.db.playAccept)
         or (event == "progress" and not ns.db.playProgress)
         or (event == "complete" and not ns.db.playComplete) then
+        return
+    end
+    if not path then
+        NotifyUnvoiced(format("\"%s\" (%s)", title or questID, event), format("q%d-%s", questID, event))
         return
     end
 

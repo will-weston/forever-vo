@@ -1,0 +1,562 @@
+{
+  "version": 1,
+  "date": "2026-09-23",
+  "formula": "native-profile-word-coverage-v1",
+  "model": "IndexTeam/IndexTTS-2.5",
+  "references": {
+    "undead-male-standard": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-standard-source.wav",
+      "sha256": "5262264d850d8f32e62827c898debbee13381231f45bbf2e737fee4f136de7e9",
+      "word_count": 22,
+      "seconds": 13.661708333333333,
+      "approved_pilot": true
+    },
+    "undead-male-dark": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-dark-source.wav",
+      "sha256": "8a73a3558bad857e215b61f4e1835fd24b44a55526407742e8cec8895cf9af96",
+      "word_count": 23,
+      "seconds": 14.410166666666667,
+      "approved_pilot": true
+    },
+    "undead-female-standard": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-female-standard-source.wav",
+      "sha256": "92fc2030c406884030460a1254365031bbdd4699f36ed7d2bd8b0e01c1b63eaf",
+      "word_count": 24,
+      "seconds": 14.270291666666667,
+      "approved_pilot": true
+    },
+    "undead-male-warrior": {
+      "path": "C:\\repos\\forever-vo\\tools\\samples\\tirisfal-stock-profiles\\undead-male-warrior-source.wav",
+      "sha256": "86e4fa07c6c17ca3f2ec089ed0784a6c6a199678caac02e5851d15f094b20919",
+      "word_count": 27,
+      "seconds": 14.489208333333334,
+      "approved_pilot": true
+    },
+    "abomination": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\abomination.wav",
+      "sha256": "559da9b0d26e3e3a18bdb4fdc4c419a9047ff32a25c2e91e1be0d8029a402260",
+      "word_count": 9,
+      "seconds": 5.996625,
+      "approved_pilot": false
+    },
+    "dwarf-male-standard": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\dwarf-male-standard.wav",
+      "sha256": "0850ac7ec8079d0212802e4155323b4f56d1091e840fa102a8190788fe63d11b",
+      "word_count": 27,
+      "seconds": 8.651125,
+      "approved_pilot": false
+    },
+    "human-male-standard": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\human-male-standard.wav",
+      "sha256": "3286a27b10537c60fa5a7f3e496d186f0aae17c97f5783b783c82f22261d8a97",
+      "word_count": 26,
+      "seconds": 6.74825,
+      "approved_pilot": false
+    },
+    "necromancer": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\necromancer.wav",
+      "sha256": "77ee90ab98df107c22992122872e9cef44e787a3841c3e27ea82791c9558bcad",
+      "word_count": 16,
+      "seconds": 6.851416666666666,
+      "approved_pilot": false
+    },
+    "undead-female-magic": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\undead-female-magic.wav",
+      "sha256": "cab02c6328017a7ccf78baf864e8e3bc9ccc0b82a9598721589f487724761aee",
+      "word_count": 25,
+      "seconds": 14.450916666666666,
+      "approved_pilot": false
+    },
+    "undead-female-warrior": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\undead-female-warrior.wav",
+      "sha256": "84675bc1c8db31fda09f3f293caa84e27844a4f74281354f03105bade0636149",
+      "word_count": 25,
+      "seconds": 13.487625,
+      "approved_pilot": false
+    }
+  },
+  "npcs": {
+    "5667": {
+      "npc": "5667",
+      "name": "Venya Marthand",
+      "display_id": 3944,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "https://www.wowhead.com/classic/npc=5667/venya-marthand#sounds",
+      "fallback": null
+    },
+    "5675": {
+      "npc": "5675",
+      "name": "Carendin Halgar",
+      "display_id": 3948,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "5724": {
+      "npc": "5724",
+      "name": "Ageron Kargal",
+      "display_id": 4107,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1569": {
+      "npc": "1569",
+      "name": "Shadow Priest Sarvis",
+      "display_id": 1584,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "https://www.wowhead.com/classic/npc=1569/shadow-priest-sarvis#sounds",
+      "fallback": null
+    },
+    "2126": {
+      "npc": "2126",
+      "name": "Maximillion",
+      "display_id": 1581,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "https://www.wowhead.com/classic/npc=2126/maximillion#sounds",
+      "fallback": null
+    },
+    "1500": {
+      "npc": "1500",
+      "name": "Coleman Farthing",
+      "display_id": 3516,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1499": {
+      "npc": "1499",
+      "name": "Magistrate Sevren",
+      "display_id": 3514,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1495": {
+      "npc": "1495",
+      "name": "Deathguard Linnea",
+      "display_id": 2858,
+      "npc_sound_id": "81",
+      "greeting_kit": 6049,
+      "profile": "undead-female-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "None": {
+      "npc": null,
+      "name": "A Letter to Yvette",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration, read with the neutral human reference."
+    },
+    "1560": {
+      "npc": "1560",
+      "name": "Yvette Farthing",
+      "display_id": 3517,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1568": {
+      "npc": "1568",
+      "name": "Undertaker Mordo",
+      "display_id": 1582,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "https://www.wowhead.com/classic/npc=1568/undertaker-mordo#sounds",
+      "fallback": null
+    },
+    "1519": {
+      "npc": "1519",
+      "name": "Deathguard Simmer",
+      "display_id": 1648,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1518": {
+      "npc": "1518",
+      "name": "Apothecary Johaan",
+      "display_id": 1565,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1498": {
+      "npc": "1498",
+      "name": "Bethor Iceshard",
+      "display_id": 4055,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1497": {
+      "npc": "1497",
+      "name": "Gunther Arcanus",
+      "display_id": 3518,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1515": {
+      "npc": "1515",
+      "name": "Executor Zygand",
+      "display_id": 1649,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "https://www.wowhead.com/classic/npc=1515/executor-zygand#sounds",
+      "fallback": null
+    },
+    "1652": {
+      "npc": "1652",
+      "name": "Deathguard Burgess",
+      "display_id": 1666,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1521": {
+      "npc": "1521",
+      "name": "Gretchen Dedmar",
+      "display_id": 3515,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1661": {
+      "npc": "1661",
+      "name": "Novice Elreth",
+      "display_id": 1593,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "https://www.wowhead.com/classic/npc=1661/novice-elreth#sounds",
+      "fallback": null
+    },
+    "1570": {
+      "npc": "1570",
+      "name": "Executor Arren",
+      "display_id": 1583,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1740": {
+      "npc": "1740",
+      "name": "Deathguard Saltain",
+      "display_id": 3523,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "https://www.wowhead.com/classic/npc=1740/deathguard-saltain#sounds",
+      "fallback": null
+    },
+    "-711": {
+      "npc": "-711",
+      "name": "Wanted!",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration, read with the neutral human reference."
+    },
+    "1496": {
+      "npc": "1496",
+      "name": "Deathguard Dillinger",
+      "display_id": 2855,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1931": {
+      "npc": "1931",
+      "name": "Captured Scarlet Zealot",
+      "display_id": 11428,
+      "npc_sound_id": "0",
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "No native NPCSoundID or Wowhead voice list; coherent stock human male set for the human prisoner."
+    },
+    "-1557": {
+      "npc": "-1557",
+      "name": "Lillith's Dinner Table",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration, read with the neutral human reference."
+    },
+    "-1586": {
+      "npc": "-1586",
+      "name": "Crate of Candles",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration, read with the neutral human reference."
+    },
+    "1937": {
+      "npc": "1937",
+      "name": "Apothecary Renferrel",
+      "display_id": 1661,
+      "npc_sound_id": "82",
+      "greeting_kit": 6042,
+      "profile": "undead-male-dark",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "2211": {
+      "npc": "2211",
+      "name": "Captured Mountaineer",
+      "display_id": 11424,
+      "npc_sound_id": "0",
+      "greeting_kit": 0,
+      "profile": "dwarf-male-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "No native NPCSoundID or Wowhead voice list; coherent stock dwarf male set for the dwarf prisoner."
+    },
+    "10666": {
+      "npc": "10666",
+      "name": "Gordo",
+      "display_id": 10006,
+      "npc_sound_id": "88",
+      "greeting_kit": 6486,
+      "profile": "abomination",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "10665": {
+      "npc": "10665",
+      "name": "Junior Apothecary Holland",
+      "display_id": 9999,
+      "npc_sound_id": "87",
+      "greeting_kit": 6484,
+      "profile": "necromancer",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "11945": {
+      "npc": "11945",
+      "name": "Claire Willower",
+      "display_id": 11904,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "6784": {
+      "npc": "6784",
+      "name": "Calvin Montague",
+      "display_id": 5509,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "11615": {
+      "npc": "11615",
+      "name": "Mickey Levine",
+      "display_id": 12469,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "-177491": {
+      "npc": "-177491",
+      "name": "Termite Barrel",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "profile": "human-male-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration, read with the neutral human reference."
+    },
+    "5688": {
+      "npc": "5688",
+      "name": "Innkeeper Renee",
+      "display_id": 8190,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1742": {
+      "npc": "1742",
+      "name": "Deathguard Bartholomew",
+      "display_id": 2853,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Classic NPC display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "251001": {
+      "npc": "251001",
+      "name": "Deathguard Kristof",
+      "display_id": 1590,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "2132": {
+      "npc": "2132",
+      "name": "Carolai Anise",
+      "display_id": 1601,
+      "npc_sound_id": "141",
+      "greeting_kit": 6663,
+      "profile": "undead-female-magic",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "1738": {
+      "npc": "1738",
+      "name": "Deathguard Terrence",
+      "display_id": 2862,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "267009": {
+      "npc": "267009",
+      "name": "Hadric Harlson",
+      "display_id": 146496,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "3549": {
+      "npc": "3549",
+      "name": "Shelene Rhobart",
+      "display_id": 1607,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "244808": {
+      "npc": "244808",
+      "name": "Aramis Hammerhand",
+      "display_id": 129405,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "246378": {
+      "npc": "246378",
+      "name": "Danitha Morr",
+      "display_id": 129985,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "267008": {
+      "npc": "267008",
+      "name": "Leonid Barthalomew the Revered",
+      "display_id": 10474,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "246389": {
+      "npc": "246389",
+      "name": "Hilda the Breaker",
+      "display_id": 129986,
+      "npc_sound_id": "80",
+      "greeting_kit": 6046,
+      "profile": "undead-female-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "259190": {
+      "npc": "259190",
+      "name": "Ephram Barbaro",
+      "display_id": 129990,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "275954": {
+      "npc": "275954",
+      "name": "Bareth Dawnstone",
+      "display_id": 148433,
+      "npc_sound_id": "84",
+      "greeting_kit": 6039,
+      "profile": "undead-male-warrior",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    },
+    "248840": {
+      "npc": "248840",
+      "name": "Trevan Rol",
+      "display_id": 129405,
+      "npc_sound_id": "83",
+      "greeting_kit": 6036,
+      "profile": "undead-male-standard",
+      "evidence": "Wowhead display ID \u00e2\u2020\u2019 cached CreatureDisplayInfo.NPCSoundID \u00e2\u2020\u2019 NPCSounds sound kits",
+      "fallback": null
+    }
+  },
+  "provenance": "Full evidence: C:/repos/forever-vo/.local-state/profile-packs/tirisfal-20260923/casting.json",
+  "non_speaker_policy": "Item/object text is neutral narration. Two prisoners have no published NPC voice assignment and use a documented species-appropriate stock set."
+}

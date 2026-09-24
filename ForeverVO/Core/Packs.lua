@@ -194,7 +194,7 @@ function Packs:FindQuest(questID, event)
         local entry = pack.quests[questID]
         if entry and entry[field] then
             local base = format("%d-%s", questID, event)
-            if entry.g then
+            if entry.g or entry[field .. "g"] then
                 base = Util.PlayerGenderPrefix() .. base
             end
             local voice = self:NarratorVoice()

@@ -1,5 +1,33 @@
 # Forever Voiceover
 
+## Native voice-profile fork
+
+This fork includes the local IndexTTS 2.5 generation workflow, NPC voice-family
+profiles, simplified settings, a static portrait with quest-style playback
+controls, an independent queue window, and the speech-bubble minimap icon.
+The current local pack covers 187 quests with 483 recordings across Tirisfal,
+Mulgore, Silverpine, and related class/delivery chains.
+
+**This repository contains source code and pack metadata, not the generated
+audio.** MP3s, reference recordings, model weights, environments, local captures,
+and backups are kept outside Git. Downloading the source alone does not install
+the voiced pack. A player release must include both `ForeverVO/` and the matching
+`ForeverVO_Data/` audio files.
+
+The current generation method is documented in
+[the voice recipe](docs/voice-audition-recipe.md); the Windows workspace is
+documented in [WINDOWS_SETUP.md](WINDOWS_SETUP.md). Historical audition reports
+contain links to local artifacts and are not portable build instructions.
+The existing UI smoke harness is available as `tools/ui_smoke_test.lua` and runs
+under Lua 5.1 from the repository root. Existing capture-boundary checks run with
+`python tools/test_local_safety.py` in the configured tools environment.
+
+Based on [Quinn Dougherty's Forever Voiceover](https://github.com/quinn-dougherty/forever-vo).
+The original license and attribution are retained. The upstream project overview
+below describes its separate releases and original Chatterbox pipeline.
+
+## Upstream project
+
 Voiced quests and NPC dialogue for World of Warcraft: Forever, with audio you
 generate yourself from a local text-to-speech model.
 

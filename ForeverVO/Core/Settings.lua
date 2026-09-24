@@ -104,7 +104,7 @@ function SettingsPanel:Open()
 end
 
 ns.OnInit(function()
-    local category = Settings.RegisterVerticalLayoutCategory("Forever Voiceover")
+    local category, layout = Settings.RegisterVerticalLayoutCategory("Forever Voiceover")
     SettingsPanel.category = category
     local head = ns.UI.TalkingHead
 
@@ -112,43 +112,51 @@ ns.OnInit(function()
         head:ApplySettings()
     end
 
-    -- What to voice
-    local voiced = Settings.RegisterVerticalLayoutSubcategory(category, "What to voice")
-    Checkbox(voiced, "playAccept", "Quest offers", "Read the quest text when a quest is offered.")
-    Checkbox(voiced, "playComplete", "Quest turn-ins", "Read the reward text when handing in a quest.")
-    Checkbox(voiced, "playProgress", "Quest progress", "Read the 'not yet complete' text when returning early. Usually best left off.")
-    Checkbox(voiced, "playGreeting", "Greetings", "Read the greeting of NPCs that offer quests.")
-    Checkbox(voiced, "playGossip", "Gossip", "Read NPC conversation text.")
-    Dropdown(voiced, "gossipFrequency", "Repeat gossip", "How often the same NPC's gossip is read again.", GOSSIP_FREQUENCIES)
+    -- Everyday choices on the landing page; preserve all existing saved keys.
+    layout:AddInitializer(CreateSettingsListSectionHeaderInitializer("Playback"))
+    Checkbox(category, "playAccept", "Quest offers", "Read the quest text when a quest is offered.")
+    Checkbox(category, "playComplete", "Quest turn-ins", "Read the reward text when handing in a quest.")
+    Checkbox(category, "playProgress", "Quest progress", "Read the reminder when you return before a quest is complete.")
+    Checkbox(category, "stopOnClose", "Stop when closing quest dialogue", "Stop the current line when you close the quest or gossip window. Leave off to keep listening as you move on.")
+    layout:AddInitializer(CreateSettingsButtonInitializer("Playback queue", "Open queue", function()
+        ns.UI.QueueList:Show()
+    end, "View, play or remove queued lines. Also available from the minimap button's right-click menu or /fvo queue.", true))
 
-    -- Audio
-    local audio = Settings.RegisterVerticalLayoutSubcategory(category, "Audio")
+    layout:AddInitializer(CreateSettingsListSectionHeaderInitializer("Appearance"))
+    Checkbox(category, "showHead", "Show dialogue panel", "Show the speaker and quest while a line plays. The X skips the current line.", RefreshHead)
+    Checkbox(category, "showText", "Show subtitles", "Display the spoken text in the dialogue panel.", RefreshHead)
+    Slider(category, "headScale", "Panel size", "Resize the dialogue panel. Drag the panel to move it; position locking is in Advanced.", 0.5, 1.5, 0.05, function(value) return format("%d%%", value * 100) end, RefreshHead)
+    Checkbox(category, "showMinimapButton", "Minimap button", "Left-click for settings. Right-click for playback controls and the queue. Drag to move.", function() ns.UI.MinimapButton:ApplySettings() end)
+
+    local advanced, advancedLayout = Settings.RegisterVerticalLayoutSubcategory(category, "Advanced")
+    advancedLayout:AddInitializer(CreateSettingsListSectionHeaderInitializer("NPC dialogue"))
+    Checkbox(advanced, "playGreeting", "Quest NPC greetings", "Read the greeting shown above an NPC's quest list.")
+    Checkbox(advanced, "playGossip", "NPC conversations", "Read NPC conversation text.")
+    Dropdown(advanced, "gossipFrequency", "Repeat conversations", "How often the same NPC's conversation is read again.", GOSSIP_FREQUENCIES)
+
+    advancedLayout:AddInitializer(CreateSettingsListSectionHeaderInitializer("Audio"))
     local channels = {}
     for _, channel in ipairs(SOUND_CHANNELS) do
         table.insert(channels, { channel, channel })
     end
-    Dropdown(audio, "soundChannel", "Sound channel", "Which volume slider controls the voiceovers.", channels)
-    Dropdown(audio, "narratorVoice", "Narrator voice",
+    Dropdown(advanced, "soundChannel", "Volume channel", "Which of the game's volume sliders controls voiceovers.", channels)
+    Dropdown(advanced, "narratorVoice", "Narrator voice",
         "Some lines have no speaker to voice them: quests and chatter from objects, items and signs. A narrator reads those. Voice packs may carry them in other voices; a line the chosen voice does not have keeps the default narrator.",
         NarratorChoices, function(voice) ns.Packs:SetNarratorVoice(voice) end)
-    Checkbox(audio, "muteGameDialog", "Mute the game's own NPC voices", "Turn off the Dialog channel while a voiceover plays so the two do not overlap.")
-    Checkbox(audio, "stopOnClose", "Stop when the dialog closes", "Stop the current line when you close the quest or gossip window.")
+    Checkbox(advanced, "muteGameDialog", "Mute overlapping NPC voices", "Temporarily mute the game's Dialog channel while a voiceover plays. Does not apply if voiceovers use the Dialog channel.")
 
-    -- Talking head
-    local display = Settings.RegisterVerticalLayoutSubcategory(category, "Talking head")
-    Checkbox(display, "showHead", "Show the talking head", "Show the speaker, their name and the text while a line plays.", RefreshHead)
-    Checkbox(display, "showText", "Show the spoken text", "Display the words being spoken, paged in time with the audio.", RefreshHead)
-    Checkbox(display, "lockHead", "Lock position", "Prevent the frame from being dragged.")
-    Checkbox(display, "factionHead", "Faction parchment style", "Read quests on the light Alliance or Horde parchment. Clear it for Blizzard's dark talking head panel.", RefreshHead)
-    Slider(display, "headScale", "Scale", "Size of the talking head.", 0.5, 1.5, 0.05, function(value) return format("%d%%", value * 100) end, RefreshHead)
-    Checkbox(display, "showMinimapButton", "Minimap button", "Show the button on the minimap. Left-click for options, right-click for playback controls, drag to move.", function() ns.UI.MinimapButton:ApplySettings() end)
-    Checkbox(display, "lockMinimapButton", "Lock minimap button", "Prevent the minimap button from being dragged.")
+    advancedLayout:AddInitializer(CreateSettingsListSectionHeaderInitializer("Position and style"))
+    Checkbox(advanced, "lockHead", "Lock dialogue panel", "Prevent the dialogue panel from being dragged.")
+    Checkbox(advanced, "factionHead", "Parchment background", "Use the quest dialog's parchment. Turn off for a dark background.", RefreshHead)
+    Checkbox(advanced, "lockMinimapButton", "Lock minimap button", "Prevent the minimap button from being dragged.")
+    advancedLayout:AddInitializer(CreateSettingsButtonInitializer("Dialogue position", "Reset position", function()
+        head.frame:ResetPosition()
+    end, "Move the dialogue panel back to the bottom center of the screen.", true))
 
-    -- Data
-    local data = Settings.RegisterVerticalLayoutSubcategory(category, "Voice packs")
-    Checkbox(data, "capture", "Record lines that have no audio", "Save every quest and gossip text you see so new voice lines can be generated from them.")
-    Checkbox(data, "notifyUnvoiced", "Say when a line has no voice", "Print a chat line, with the export reminder, whenever a quest or gossip text has no audio yet.")
-    Checkbox(data, "debug", "Debug messages", "Print matching details to chat.")
+    advancedLayout:AddInitializer(CreateSettingsListSectionHeaderInitializer("Voice pack tools"))
+    Checkbox(advanced, "capture", "Save dialogue for voice generation", "Save quest and conversation text you encounter so new voice lines can be generated.")
+    Checkbox(advanced, "notifyUnvoiced", "Missing voice notices", "Print a chat message when dialogue has no audio yet.")
+    Checkbox(advanced, "debug", "Debug messages", "Print matching details to chat.")
 
     Settings.RegisterAddOnCategory(category)
 end)

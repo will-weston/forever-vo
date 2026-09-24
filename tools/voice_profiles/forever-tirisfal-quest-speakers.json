@@ -1,0 +1,13 @@
+{
+  "verified_date": "2026-09-23",
+  "method": "Wowhead Forever quest pages, explicitly labeled Start/End entries in Quick Facts; browser DOM inspected. This verifies speakers, not the missing dialogue text.",
+  "quests": {
+    "99141": {"title": "Patience", "start": 1515, "end": 1515, "start_name": "Executor Zygand", "end_name": "Executor Zygand", "source": "https://www.wowhead.com/forever/quest=99141/patience"},
+    "99134": {"title": "Discipline", "start": 1515, "end": 1515, "start_name": "Executor Zygand", "end_name": "Executor Zygand", "source": "https://www.wowhead.com/forever/quest=99134/discipline"},
+    "99142": {"title": "Tomb Weed", "start": 10665, "end": 10665, "start_name": "Junior Apothecary Holland", "end_name": "Junior Apothecary Holland", "source": "https://www.wowhead.com/forever/quest=99142/tomb-weed"},
+    "99156": {"title": "Rear Guard Patrol", "start": 1495, "end": 1495, "start_name": "Deathguard Linnea", "end_name": "Deathguard Linnea", "source": "https://www.wowhead.com/forever/quest=99156/rear-guard-patrol"},
+    "95314": {"title": "That Shadowvale Green Elixir", "start": 2132, "end": 2132, "start_name": "Carolai Anise", "end_name": "Carolai Anise", "source": "https://www.wowhead.com/forever/quest=95314/that-shadowvale-green-elixir"},
+    "86784": {"title": "Sticks and Bones", "start": 1742, "end": 265812, "start_name": "Deathguard Bartholomew", "end_name": "Eleanor Shackleton", "source": "https://www.wowhead.com/forever/quest=86784/sticks-and-bones"},
+    "98389": {"title": "A Light in the Darkness", "start": 244808, "end": 244808, "start_name": "Aramis Hammerhand", "end_name": "Aramis Hammerhand", "source": "https://www.wowhead.com/forever/quest=98389/a-light-in-the-darkness"}
+  }
+}

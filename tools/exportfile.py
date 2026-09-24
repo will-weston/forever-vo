@@ -17,6 +17,7 @@ import zlib
 from pathlib import Path
 
 PREFIX = "FVO1:"
+MAX_EXPORT_BYTES = 16 * 1024 * 1024
 _TOKEN = re.compile(r"FVO1:[A-Za-z0-9+/=\s]+")
 
 
@@ -31,8 +32,14 @@ def find_export(text: str) -> str | None:
 def decode(export: str) -> dict:
     if not export.startswith(PREFIX):
         raise ValueError("not a Forever Voiceover export string")
-    raw = base64.b64decode(export[len(PREFIX):])
-    data = json.loads(zlib.decompress(raw).decode("utf-8"))
+    if len(export) > MAX_EXPORT_BYTES:
+        raise ValueError("export is too large")
+    raw = base64.b64decode(export[len(PREFIX):], validate=True)
+    decoder = zlib.decompressobj()
+    decoded = decoder.decompress(raw, MAX_EXPORT_BYTES + 1)
+    if len(decoded) > MAX_EXPORT_BYTES or not decoder.eof:
+        raise ValueError("export is too large or incomplete")
+    data = json.loads(decoded.decode("utf-8"))
     if data.get("v") != 1:
         raise ValueError(f"unsupported export version {data.get('v')}")
     return data
@@ -60,6 +67,10 @@ def to_capture(data: dict, origin: str) -> dict:
         if line.get("k") == "quest":
             if not entry["questID"]:
                 continue
+            if type(entry["questID"]) is not int or entry["questID"] <= 0:
+                raise ValueError("quest ID must be a positive integer")
+            if entry["event"] not in ("accept", "progress", "complete"):
+                raise ValueError("invalid quest event")
             out["quests"][f"{entry['questID']}-{entry['event']}"] = entry
         else:
             from textkey import text_key  # local import keeps the stdlib-only path for --raw

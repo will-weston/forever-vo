@@ -1,0 +1,499 @@
+{
+  "formula": "native-profile-word-coverage-v1",
+  "references": {
+    "npc-sound-132": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-132.wav",
+      "sha256": "4d8d6050455f0feed81479c6e96e87f3cab0bd3de22c9e50dce4ff8a4313a26d",
+      "word_count": 32,
+      "seconds": 14.400375,
+      "approved_pilot": false
+    },
+    "npc-sound-171": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-171.wav",
+      "sha256": "d4865ae3758bab866f1396b8d8b0a911ee2634e2a4b2a44e3a57d1c7a1134558",
+      "word_count": 33,
+      "seconds": 13.562541666666666,
+      "approved_pilot": false
+    },
+    "npc-sound-3773": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-3773.wav",
+      "sha256": "bf856a837f27cb3b038ec498b2b7a71e5a504b27761ed9717dc8abda9124dcac",
+      "word_count": 27,
+      "seconds": 14.788125,
+      "approved_pilot": false
+    },
+    "npc-sound-54": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-54.wav",
+      "sha256": "b3dba67da7fe05dfc4513e0577d563f7b2deeeedb94f716baa543b4a068c7233",
+      "word_count": 25,
+      "seconds": 10.969458333333334,
+      "approved_pilot": false
+    },
+    "npc-sound-60": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-60.wav",
+      "sha256": "8410210f1b4daa36e515c6155408eff6babfdf0f9b87b97837d8b80506de09a8",
+      "word_count": 20,
+      "seconds": 10.822583333333334,
+      "approved_pilot": false
+    },
+    "npc-sound-67": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-67.wav",
+      "sha256": "a2389a98cd928c39ada544c96ac05cd28d9335a85890a11df5350b9c93924f7c",
+      "word_count": 30,
+      "seconds": 14.489875,
+      "approved_pilot": false
+    },
+    "npc-sound-68": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-68.wav",
+      "sha256": "78b8e4fe795982cab62b519ea1ab57d426fad45f1e3b23370aac6819bf649b6d",
+      "word_count": 27,
+      "seconds": 13.665791666666667,
+      "approved_pilot": false
+    },
+    "npc-sound-69": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-69.wav",
+      "sha256": "273987e3e4f82f62cd3a780edc1660cd36bb466dbebf553aac46613a4001c62b",
+      "word_count": 16,
+      "seconds": 5.284208333333333,
+      "approved_pilot": false
+    },
+    "npc-sound-70": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-70.wav",
+      "sha256": "8bec38882e8f017cf715af2a7f376a5e78ba702a5d6b61095582d6e98dc62cf7",
+      "word_count": 34,
+      "seconds": 12.82675,
+      "approved_pilot": false
+    },
+    "npc-sound-71": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-71.wav",
+      "sha256": "99f14e567a6f868e9c54760f14c9917e434a25d1ad2cc632ee92298ad464da56",
+      "word_count": 35,
+      "seconds": 13.807375,
+      "approved_pilot": false
+    },
+    "npc-sound-72": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\mulgore-20260923\\references\\npc-sound-72.wav",
+      "sha256": "b0a4f79e9904180b98cefd54ccf50e42a2e273bc5979c2a8af36e5671e6a5146",
+      "word_count": 15,
+      "seconds": 6.185625,
+      "approved_pilot": false
+    },
+    "narrator": {
+      "path": "C:\\repos\\forever-vo\\.local-state\\profile-packs\\tirisfal-20260923\\references\\human-male-standard.wav",
+      "sha256": "3286a27b10537c60fa5a7f3e496d186f0aae17c97f5783b783c82f22261d8a97",
+      "word_count": 26,
+      "seconds": 6.74825,
+      "approved_pilot": false,
+      "reused_from": "Tirisfal neutral object narration"
+    }
+  },
+  "npcs": {
+    "5888": {
+      "npc": "5888",
+      "name": "Seer Ravenfeather",
+      "display_id": 4533,
+      "npc_sound_id": "70",
+      "greeting_kit": 6055,
+      "farewell_kit": 6056,
+      "profile": "npc-sound-70",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "5891": {
+      "npc": "5891",
+      "name": "Minor Manifestation of Earth",
+      "display_id": 12110,
+      "npc_sound_id": "0",
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": "Minor Manifestation of Earth has no native spoken greeting kit; preserve prior narrator casting."
+    },
+    "6775": {
+      "npc": "6775",
+      "name": "Antur Fallow",
+      "display_id": 5506,
+      "npc_sound_id": "72",
+      "greeting_kit": 6061,
+      "farewell_kit": 6063,
+      "profile": "npc-sound-72",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "6747": {
+      "npc": "6747",
+      "name": "Innkeeper Kauth",
+      "display_id": 5486,
+      "npc_sound_id": "132",
+      "greeting_kit": 6654,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-132",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2980": {
+      "npc": "2980",
+      "name": "Grull Hawkwind",
+      "display_id": 3808,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3059": {
+      "npc": "3059",
+      "name": "Harutt Thunderhorn",
+      "display_id": 3793,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3061": {
+      "npc": "3061",
+      "name": "Lanka Farshot",
+      "display_id": 3810,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3062": {
+      "npc": "3062",
+      "name": "Meela Dawnstrider",
+      "display_id": 10180,
+      "npc_sound_id": "71",
+      "greeting_kit": 6058,
+      "farewell_kit": 6059,
+      "profile": "npc-sound-71",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3060": {
+      "npc": "3060",
+      "name": "Gart Mistrunner",
+      "display_id": 3819,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3209": {
+      "npc": "3209",
+      "name": "Brave Windfeather",
+      "display_id": 3770,
+      "npc_sound_id": "70",
+      "greeting_kit": 6055,
+      "farewell_kit": 6056,
+      "profile": "npc-sound-70",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3033": {
+      "npc": "3033",
+      "name": "Turak Runetotem",
+      "display_id": 2106,
+      "npc_sound_id": "67",
+      "greeting_kit": 6014,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "11802": {
+      "npc": "11802",
+      "name": "Dendrite Starblaze",
+      "display_id": 11769,
+      "npc_sound_id": "54",
+      "greeting_kit": 5992,
+      "farewell_kit": 5993,
+      "profile": "npc-sound-54",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3064": {
+      "npc": "3064",
+      "name": "Gennia Runetotem",
+      "display_id": 3820,
+      "npc_sound_id": "71",
+      "greeting_kit": 6058,
+      "farewell_kit": 6059,
+      "profile": "npc-sound-71",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3065": {
+      "npc": "3065",
+      "name": "Yaw Sharpmane",
+      "display_id": 3811,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3038": {
+      "npc": "3038",
+      "name": "Kary Thunderhorn",
+      "display_id": 2112,
+      "npc_sound_id": "71",
+      "greeting_kit": 6058,
+      "farewell_kit": 6059,
+      "profile": "npc-sound-71",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3039": {
+      "npc": "3039",
+      "name": "Holt Thunderhorn",
+      "display_id": 2087,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2985": {
+      "npc": "2985",
+      "name": "Ruul Eagletalon",
+      "display_id": 3822,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2993": {
+      "npc": "2993",
+      "name": "Baine Bloodhoof",
+      "display_id": 3792,
+      "npc_sound_id": "67",
+      "greeting_kit": 6014,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2948": {
+      "npc": "2948",
+      "name": "Mull Thunderhorn",
+      "display_id": 3826,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2988": {
+      "npc": "2988",
+      "name": "Morin Cloudstalker",
+      "display_id": 1624,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "-2908": {
+      "npc": "-2908",
+      "name": "Sealed Supply Crate",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration."
+    },
+    "2981": {
+      "npc": "2981",
+      "name": "Chief Hawkwind",
+      "display_id": 3809,
+      "npc_sound_id": "67",
+      "greeting_kit": 6014,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2991": {
+      "npc": "2991",
+      "name": "Greatmother Hawkwind",
+      "display_id": 3841,
+      "npc_sound_id": "70",
+      "greeting_kit": 6055,
+      "farewell_kit": 6056,
+      "profile": "npc-sound-70",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2982": {
+      "npc": "2982",
+      "name": "Seer Graytongue",
+      "display_id": 3813,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2947": {
+      "npc": "2947",
+      "name": "Harken Windtotem",
+      "display_id": 3821,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3055": {
+      "npc": "3055",
+      "name": "Maur Raincaller",
+      "display_id": 1678,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3054": {
+      "npc": "3054",
+      "name": "Zarlman Two-Moons",
+      "display_id": 3814,
+      "npc_sound_id": "67",
+      "greeting_kit": 6014,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "None": {
+      "npc": null,
+      "name": "Demon Scarred Cloak",
+      "display_id": null,
+      "npc_sound_id": null,
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "narrator",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": "Non-speaking item/object narration."
+    },
+    "3052": {
+      "npc": "3052",
+      "name": "Skorn Whitecloud",
+      "display_id": 3823,
+      "npc_sound_id": "69",
+      "greeting_kit": 6008,
+      "farewell_kit": 6009,
+      "profile": "npc-sound-69",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2984": {
+      "npc": "2984",
+      "name": "Seer Wiserunner",
+      "display_id": 3815,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "2994": {
+      "npc": "2994",
+      "name": "Ancestral Spirit",
+      "display_id": 3824,
+      "npc_sound_id": "0",
+      "greeting_kit": 0,
+      "farewell_kit": 0,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": "Ancestral Spirit has NPCSoundID 0 in the cached display; preserve the prior matching Tauren male stock-family casting."
+    },
+    "3057": {
+      "npc": "3057",
+      "name": "Cairne Bloodhoof",
+      "display_id": 4307,
+      "npc_sound_id": "171",
+      "greeting_kit": 7219,
+      "farewell_kit": 0,
+      "profile": "npc-sound-171",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3233": {
+      "npc": "3233",
+      "name": "Lorekeeper Raintotem",
+      "display_id": 3817,
+      "npc_sound_id": "67",
+      "greeting_kit": 6014,
+      "farewell_kit": 6015,
+      "profile": "npc-sound-67",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3418": {
+      "npc": "3418",
+      "name": "Kirge Sternhorn",
+      "display_id": 3818,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3429": {
+      "npc": "3429",
+      "name": "Thork",
+      "display_id": 3856,
+      "npc_sound_id": "60",
+      "greeting_kit": 6018,
+      "farewell_kit": 6019,
+      "profile": "npc-sound-60",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "3441": {
+      "npc": "3441",
+      "name": "Melor Stonehoof",
+      "display_id": 4520,
+      "npc_sound_id": "68",
+      "greeting_kit": 6011,
+      "farewell_kit": 6012,
+      "profile": "npc-sound-68",
+      "evidence": "Classic NPC display ID → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    },
+    "259119": {
+      "npc": "259119",
+      "name": "Alaana Stormwalker",
+      "display_id": 143208,
+      "npc_sound_id": "3773",
+      "greeting_kit": 353056,
+      "farewell_kit": 353058,
+      "profile": "npc-sound-3773",
+      "evidence": "https://www.wowhead.com/forever/npc=259119/alaana-stormwalker → cached CreatureDisplayInfo.NPCSoundID → NPCSounds sound kits",
+      "fallback": null
+    }
+  }
+}

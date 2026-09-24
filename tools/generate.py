@@ -68,6 +68,8 @@ class Item:
         self.raw_text = entry.get("text") or ""
         self.event = entry.get("event") or "gossip"
         self.speaker_key = entry.get("npc")   # "288" or "-123" (game object)
+        if kind == "quests" and self.event not in QUEST_EVENTS:
+            raise ValueError(f"Invalid quest event: {self.event!r}")
 
     @property
     def subfolder(self) -> str:
@@ -116,8 +118,12 @@ def narrator_dir(sounds_dir: Path, voice: str, subfolder: str = "Quests") -> Pat
 
 def sound_path(subfolder: str, base: str, voice: str = NARRATOR_VOICE, sounds_dir: Path = SOUNDS_DIR) -> Path:
     if voice == NARRATOR_VOICE:
-        return sounds_dir / subfolder / f"{base}.mp3"
-    return narrator_dir(sounds_dir, voice, subfolder) / f"{base}.mp3"
+        path = sounds_dir / subfolder / f"{base}.mp3"
+    else:
+        path = narrator_dir(sounds_dir, voice, subfolder) / f"{base}.mp3"
+    if not path.resolve().is_relative_to(sounds_dir.resolve()):
+        raise ValueError("Audio output must stay inside the Sounds directory")
+    return path
 
 
 def index_key(base: str, voice: str = NARRATOR_VOICE) -> str:
@@ -216,6 +222,9 @@ def load_items(capture: dict, include_progress: bool) -> list[Item]:
 
 class Synth:
     def __init__(self, device: str = "cuda", allow_cpu: bool = False):
+        settings_path = DATA_DIR / "tts_settings.json"
+        self.voice_settings = (json.loads(settings_path.read_text(encoding="utf-8"))
+                               if settings_path.exists() else {})
         import perth
         import torch
         if getattr(perth, "PerthImplicitWatermarker", None) is None:
@@ -251,11 +260,21 @@ class Synth:
 
     def speak(self, text: str, voice: str, out_mp3: Path) -> float:
         reference = self.reference_for(voice)
+        settings = self.voice_settings.get(voice, {})
+        if "seed" in settings:
+            import random
+            import numpy as np
+            random.seed(settings["seed"])
+            np.random.seed(settings["seed"])
+            self.torch.manual_seed(settings["seed"])
+        if settings.get("normalize_dashes"):
+            text = text.replace("--", ", ")
         pieces = []
-        silence = self.torch.zeros(1, int(self.sr * 0.35))
+        silence = self.torch.zeros(1, int(self.sr * settings.get("chunk_pause", 0.35)))
         for part in chunk(text):
             kwargs = {"audio_prompt_path": str(reference)} if reference else {}
-            wav = self.model.generate(part, exaggeration=0.45, cfg_weight=0.5, **kwargs)
+            wav = self.model.generate(part, exaggeration=settings.get("exaggeration", 0.45),
+                                      cfg_weight=settings.get("cfg_weight", 0.5), **kwargs)
             pieces.append(wav.cpu())
             pieces.append(silence)
         audio = self.torch.cat(pieces[:-1], dim=-1)
@@ -423,7 +442,9 @@ def rebuild_tables(items: list[Item], sound_index: dict[str, float], data_dir: P
             record = quests.setdefault(quest_id, {})
             record[QUEST_EVENTS[item.event]] = round(duration, 3)
             if gendered:
-                record["g"] = True
+                # Only this event needs gender variants; other events for the
+                # same quest may still have a single shared recording.
+                record[QUEST_EVENTS[item.event] + "g"] = True
             if speaker is not None and record.get("npc") is None:
                 record["npc"] = speaker
             for voice, seconds in alternates.items():

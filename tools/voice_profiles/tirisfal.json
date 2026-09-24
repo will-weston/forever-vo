@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "verified_date": "2026-09-23",
+  "evidence": "Read the sound Listview JSON embedded in each named Wowhead NPC page using the browser. File IDs and kit IDs below are the site's published mappings; no race-only inference.",
+  "model": "IndexTeam/IndexTTS-2.5",
+  "selection": {"max_seconds": 14.8, "target_words": 30, "gap_seconds": 0.08, "min_clip_words": 3, "max_clips": 7, "angry_in_identity": false, "trim_words": false, "time_stretch": false},
+  "profiles": {
+    "undead-male-standard": {
+      "native_name": "UndeadMaleStandard",
+      "kits": {"Greeting": 6036, "Farewell": 6037, "Angry": 6038},
+      "greetings": [563172, 563174, 563175, 563180, 563181, 563183],
+      "farewells": [563173, 563176, 563177, 563178, 563185],
+      "mandatory": [],
+      "representative": "363-accept",
+      "direction": "Dry, matter-of-fact caretaker; casual dark humor. Identity comes from his own native set."
+    },
+    "undead-male-dark": {
+      "native_name": "UndeadMaleDark",
+      "kits": {"Greeting": 6042, "Farewell": 6043, "Angry": 6044},
+      "greetings": [563150, 563151, 563157, 563158, 563161, 563162, 563163],
+      "farewells": [563147, 563148, 563152, 563154, 563155, 563165, 563167],
+      "mandatory": [563151, 563154],
+      "representative": "3901-accept",
+      "direction": "Measured conviction, stern but controlled. Preserve I am Forsaken and Victory for Sylvanas from this exact set."
+    },
+    "undead-female-standard": {
+      "native_name": "UndeadFemaleStandard",
+      "kits": {"Greeting": 6046, "Farewell": 6047, "Angry": 6048},
+      "greetings": [563111, 563112, 563113, 563116, 563123, 563127],
+      "farewells": [563110, 563117, 563119, 563124, 563125],
+      "mandatory": [],
+      "representative": "376-accept",
+      "direction": "Practical, unsentimental healer; faint impatience, useful instructions."
+    },
+    "undead-male-warrior": {
+      "native_name": "UndeadMaleWarrior",
+      "kits": {"Greeting": 6039, "Farewell": 6040, "Angry": 6041},
+      "greetings": [563188, 563190, 563191, 563195, 563198, 563199],
+      "farewells": [563187, 563189, 563192, 563194, 563196, 563202, 563204, 563205],
+      "mandatory": [563191],
+      "representative": "3902-accept",
+      "direction": "Clipped orders from an impatient guard; avoid yelling. Keep the Warrior recordings separate from Dark."
+    }
+  },
+  "npcs": {
+    "1568": {"name": "Undertaker Mordo", "profile": "undead-male-standard", "source": "https://www.wowhead.com/classic/npc=1568/undertaker-mordo#sounds"},
+    "1569": {"name": "Shadow Priest Sarvis", "profile": "undead-male-dark", "source": "https://www.wowhead.com/classic/npc=1569/shadow-priest-sarvis#sounds"},
+    "2126": {"name": "Maximillion", "profile": "undead-male-dark", "source": "https://www.wowhead.com/classic/npc=2126/maximillion#sounds"},
+    "1661": {"name": "Novice Elreth", "profile": "undead-female-standard", "source": "https://www.wowhead.com/classic/npc=1661/novice-elreth#sounds"},
+    "5667": {"name": "Venya Marthand", "profile": "undead-female-standard", "source": "https://www.wowhead.com/classic/npc=5667/venya-marthand#sounds"},
+    "1740": {"name": "Deathguard Saltain", "profile": "undead-male-warrior", "source": "https://www.wowhead.com/classic/npc=1740/deathguard-saltain#sounds"},
+    "1515": {"name": "Executor Zygand", "profile": "undead-male-warrior", "source": "https://www.wowhead.com/classic/npc=1515/executor-zygand#sounds"},
+    "244808": {"name": "Aramis Hammerhand", "profile": null, "source": "https://www.wowhead.com/forever/npc=244808/aramis-hammerhand#sounds", "status": "No sound list exposed on inspected page; do not guess a native set."}
+  }
+}
