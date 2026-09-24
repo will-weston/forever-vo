@@ -24,7 +24,6 @@ Core\Capture.lua
 Core\Export.lua
 Core\Welcome.lua
 UI\TalkingHead.lua
-UI\QueueList.lua
 UI\QuestLog.lua
 UI\MinimapButton.lua
 Core\Settings.lua

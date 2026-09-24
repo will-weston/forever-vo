@@ -119,25 +119,6 @@ end
 -- Gossip events
 -- ---------------------------------------------------------------------------
 
-local function ShouldPlayGossip(speaker)
-    local frequency = ns.db.gossipFrequency
-    if frequency == "never" then
-        return false
-    end
-    local npcKey = speaker.guid or speaker.name or "unknown"
-    local seen = ns.char.seenGossip[npcKey]
-    if frequency == "oncePerNPC" and seen then
-        return false
-    end
-    if frequency == "oncePerQuestNPC" and seen then
-        local hasQuests = C_GossipInfo.GetNumActiveQuests() > 0 or C_GossipInfo.GetNumAvailableQuests() > 0
-        if hasQuests then
-            return false
-        end
-    end
-    return true, npcKey
-end
-
 local function QueueGossip(event, text)
     if not text or text == "" then
         return
@@ -158,14 +139,8 @@ local function QueueGossip(event, text)
         NotifyUnvoiced(format("%s's %s", speaker.name or "this NPC", event == "greeting" and "greeting" or "gossip"), speaker.guid or speaker.name)
         return
     end
-    if (event == "greeting" and not ns.db.playGreeting) or (event == "gossip" and not ns.db.playGossip) then
-        return
-    end
-    local play, npcKey = ShouldPlayGossip(speaker)
-    if not play then
-        return
-    end
-
+    -- Read available dialogue whenever it is opened. Queue:Add already avoids
+    -- duplicate pending lines and keeps conversations from interrupting quests.
     local item = {
         kind = "gossip", event = event, text = text,
         title = selectedGossipOption and format("\"%s\"", selectedGossipOption) or nil,
@@ -174,7 +149,6 @@ local function QueueGossip(event, text)
     }
     if Queue:Add(item) then
         currentGossipItem = item
-        ns.char.seenGossip[npcKey] = true
     end
 end
 

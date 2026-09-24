@@ -23,13 +23,9 @@ ns.defaults = {
     playAccept = true,
     playProgress = false,
     playComplete = true,
-    playGreeting = true,
-    playGossip = true,
-    gossipFrequency = "oncePerQuestNPC", -- always | oncePerQuestNPC | oncePerNPC | never
 
     -- Audio
     soundChannel = "Master",             -- Master | Dialog | SFX | Music | Ambience
-    narratorVoice = "narrator",          -- voice for quests given by objects and items (see Packs.lua)
     muteGameDialog = true,
     stopOnClose = false,
 
@@ -38,8 +34,6 @@ ns.defaults = {
     lockHead = false,
     headScale = 1,
     showText = true,
-    showQueuePanel = false,
-    factionHead = true,
     showMinimapButton = true,
     lockMinimapButton = false,
     minimapAngle = 225,
@@ -52,7 +46,6 @@ ns.defaults = {
 
 ns.charDefaults = {
     paused = false,
-    seenGossip = {},
 }
 
 local function ApplyDefaults(target, defaults)

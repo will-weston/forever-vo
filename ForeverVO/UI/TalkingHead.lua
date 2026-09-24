@@ -25,18 +25,6 @@ local function Alpha(group, target, fromAlpha, toAlpha, duration)
     anim:SetOrder(1)
 end
 
-function TalkingHead.EventIcon(item)
-    local event = item.event
-    if event == "accept" then
-        return ns.mediaPath .. "BulletAccept"
-    elseif event == "progress" then
-        return ns.mediaPath .. "BulletProgress"
-    elseif event == "complete" then
-        return ns.mediaPath .. "BulletComplete"
-    end
-    return ns.mediaPath .. "BulletGossip"
-end
-
 -- ---------------------------------------------------------------------------
 -- Construction
 -- ---------------------------------------------------------------------------
@@ -238,19 +226,12 @@ end
 
 function TalkingHead:ApplyTextureKit()
     local frame = self.frame
-    local parchment = ns.db.factionHead ~= false
-    if parchment then
-        frame.TextBackground:SetAtlas("QuestBG-Parchment")
-        frame.Title:SetTextColor(0.18, 0.12, 0.06)
-        frame.Text:SetTextColor(0.12, 0.08, 0.04)
-    else
-        frame.TextBackground:SetColorTexture(0.08, 0.07, 0.06, 1)
-        frame.Title:SetTextColor(1, 0.82, 0.02)
-        frame.Text:SetTextColor(0.95, 0.92, 0.85)
-    end
+    frame.TextBackground:SetAtlas("QuestBG-Parchment")
+    frame.Title:SetTextColor(0.18, 0.12, 0.06)
+    frame.Text:SetTextColor(0.12, 0.08, 0.04)
     frame.Name:SetTextColor(1, 0.82, 0.02)
-    frame.Title:SetShadowColor(0, 0, 0, parchment and 0 or 1)
-    frame.Text:SetShadowColor(0, 0, 0, parchment and 0 or 1)
+    frame.Title:SetShadowColor(0, 0, 0, 0)
+    frame.Text:SetShadowColor(0, 0, 0, 0)
 end
 
 function TalkingHead:ApplySettings()

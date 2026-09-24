@@ -61,7 +61,8 @@ game's own recordings).
 - UI follows Blizzard's own frames: the talking head is a rebuild of
   `TalkingHeadFrame` (same atlases, anchors, animations); buttons use
   `UIPanelButtonTemplate`; options use `Settings.RegisterAddOnSetting` and
-  friends; the queue is a `CallbackRegistryMixin`; rows use frame pools.
+  friends; the internal playback queue is a `CallbackRegistryMixin`.
+  There is no separate queue window or manual reordering UI in this fork.
   Keep that discipline: no embedded libraries, native look.
 - Voice pack format is documented at the top of `ForeverVO/Core/Packs.lua`.
   Quests are keyed by ID and event with durations; gossip by speaker key
@@ -301,15 +302,13 @@ The owner's machine picks those up on the next sync.
 - `--assume-voice` on `generate.py` voices cache-only quests whose giver is
   unknown (used once for Zephras Isle with `skyborne-male`); the voice-change
   check fixes them once a capture names the giver.
-- `NARRATOR_VOICES` is the narrator menu: five alternates beside the default,
-  over ~1,040 narrated quest and ~336 narrated gossip lines in the full Classic
-  set (6,865 files, ~20 h of GPU). The player's pick lives in the
-  `ForeverVO_narratorVoice` CVar, because saved variables do not survive a
-  session on this beta.
-- The talking head defaults to the faction parchment; clearing `factionHead`
-  gives Blizzard's dark panel (the "Normal" kit). Gold text vanished on the
-  parchment until each kit got its own dark Name/Title/Text and no shadow:
-  `FONT_COLORS` in `UI/TalkingHead.lua`. Check both kits after touching it.
+- `NARRATOR_VOICES` remains an upstream generation option. This fork always
+  plays the default narration; it does not expose a narrator picker or read the
+  old `ForeverVO_narratorVoice` CVar. Use `--narrator-voices none` for this fork.
+- The talking head always uses quest parchment with dark body/title text.
+  There is no background selector. NPC greetings and conversations always play
+  when available; the internal queue deduplicates pending audio and gives quest
+  dialogue priority. The old repeat-frequency and dialogue toggles are unused.
 
 ## Things the owner wants next
 

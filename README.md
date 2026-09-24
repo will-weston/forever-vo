@@ -4,7 +4,10 @@
 
 This fork includes the local IndexTTS 2.5 generation workflow, NPC voice-family
 profiles, simplified settings, a static portrait with quest-style playback
-controls, an independent queue window, and the speech-bubble minimap icon.
+controls and the speech-bubble minimap icon. Playback uses Pause, Skip, and Close;
+there is no separate queue window. NPC dialogue plays whenever audio is available,
+including repeat conversations. Object and item dialogue uses the pack's default
+narration, and the dialogue panel always uses the quest-style parchment.
 The current local pack covers 187 quests with 483 recordings across Tirisfal,
 Mulgore, Silverpine, and related class/delivery chains.
 
@@ -38,8 +41,8 @@ Three addons on CurseForge: the player, and two voice packs that stack.
 - **[Forever Voiceover](https://www.curseforge.com/wow/addons/forever-voiceover)**
   (`ForeverVO`) — the player, and the only one you need to start. Reads quest
   offers, turn-ins, greetings and gossip from installed voice packs and plays
-  them through a talking-head frame styled after the client's own, with a queue
-  you can pause, skip and reorder, and a replay button on each quest you open in
+  them through a talking-head frame styled after the client's own, with playback
+  you can pause or skip, and a replay button on each quest you open in
   the quest log. It also records every line it sees so new audio can be
   generated for what is still missing.
 - **[Forever Voiceover Data: Base](https://www.curseforge.com/wow/addons/forever-voiceover-data-base)**
@@ -105,21 +108,20 @@ ln -s "$PWD/ForeverVO_Data" "$B/ForeverVO_Data"
 ```
 
 Provide `tools/voices/narrator.wav` (10 to 20 s of clean speech) for quests and
-gossip from items and objects. Those lines are generated again in each voice in
-`config.NARRATOR_VOICES`, under `Sounds/<Quests|Gossip>/Narrator/<voice>/`, so
-players can pick the narrator they prefer in the options. The extra passes sort after
-every line that has no audio at all; `--narrator-voices none` leaves them out
-of a run and `--narrator-only` makes a run of nothing else.
+gossip from items and objects. This fork plays the pack's default narration.
+The upstream generator can also produce alternate voices under
+`Sounds/<Quests|Gossip>/Narrator/<voice>/`; use `--narrator-voices none` to omit
+those unused alternates when generating audio for this fork.
 
 ## In game
 
-- `/fvo` opens the options. `/fvo pause|resume|skip|clear|replay|queue|head|reset|narrator|status|debug`.
+- `/fvo` opens the options. `/fvo pause|resume|skip|clear|replay|head|reset|status|debug`.
 - The narrator reads the lines with no speaker to voice them: quests and
-  chatter from objects, items and signs. Options > Audio > Narrator voice picks
-  which voice that is, from whatever the pack carries; `/fvo narrator` cycles.
-- Right-click the talking head to skip; the X clears the queue; "Queue" shows
-  what is waiting; drag to move (lockable in options).
-- The addon compartment entry (next to the minimap) has the same controls.
+  chatter from objects, items and signs. The pack supplies this voice automatically.
+- Pause/Play controls playback. Skip, the X, or right-clicking the dialogue panel
+  dismisses the current line and continues with the next one. Drag to move
+  the panel (lockable in options).
+- The minimap button opens settings; right-click opens the playback menu.
 - Opening a quest in the quest log puts a Play button beside Back, for quests
   that have audio.
 

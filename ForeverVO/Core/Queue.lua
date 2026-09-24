@@ -176,27 +176,6 @@ function Queue:RemoveQuest(questID)
     end
 end
 
-function Queue:MoveToFront(item)
-    local index
-    for i, queued in ipairs(self.items) do
-        if queued == item then
-            index = i
-            break
-        end
-    end
-    if not index or index == 1 then
-        return
-    end
-    local current = self.items[1]
-    StopPlayback(current)
-    table.remove(self.items, index)
-    table.insert(self.items, 1, item)
-    if not self:IsPaused() then
-        StartPlayback(self, item)
-    end
-    self:TriggerEvent("OnChanged")
-end
-
 function Queue:Pause()
     if self:IsPaused() then
         return
