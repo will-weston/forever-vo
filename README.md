@@ -11,7 +11,7 @@ narration, and the dialogue panel always uses the quest-style parchment.
 The current local pack covers 187 quests with 483 recordings across Tirisfal,
 Mulgore, Silverpine, and related class/delivery chains.
 
-Synced with upstream `main` through `99d78ee` on September 24, 2026, including
+Synced with upstream `main` through `ed3c6fb` on September 24, 2026, including
 46 additional community capture files, text/gender repairs, and mixed
 speaker/narrator playback support. The community corpus now contains 673 quest
 stages and 286 conversation records. New text is available for generation; this
